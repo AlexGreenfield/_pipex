@@ -32,50 +32,111 @@ Es importante entender que aunque un comando no use el `stdin` para nada, por ej
 
 ## Funciones permitidas
 
+**Funciones que ya conocemos:**
+
 * `open`
 * `close`
 * `read`
 * `write`
-* `perror`: Imprime mensaje personalizado seguiedo de la descripción del error `errno`.
-* `strerror`: Devuelve cadena que describe el `errno` por si hay que procesarla de alguna forma.
-* `access`: Verifica los permisos de acceso a un archivo (lectura, escritura o ejecución), la idea es llamarla antes de `execve` para comprobar si un archivo existe y es ejecutable.
+* `malloc`
+* `free`
+
+**Nuevas funciones:**
+
+### `perror`
+Imprime mensaje personalizado seguiedo de la descripción del error `errno`.
+
+### `strerror`
+
+
+Devuelve cadena que describe el `errno` por si hay que procesarla de alguna forma.
+
+### `access`
+
+	int access(const char *pathname, int mode);
+
+"Check user's permissions for a file"
+
+Verifica que un programa puede acceder al archivo marcado por *pathname*, mientras que *mode* especifica que tipo de permiso (lectura, escritura, ejecución...) tiene el archivo. Se puede usar un bitwise OR o AND para comprobar varios valores.
+
+En caso de éxito, devuelve 0. En error, -1.
+
+Una implementación podría ser:
+
+	if (access("rwfile", R_OK|W_OK) == 0)
+		printf("rwfile is accessible in writing and reading mode\n");
+
+La idea es llamarla antes de `execve` para comprobar si un archivo existe y es ejecutable.
 
 ### `dup`
 
-**<unistd.h>** Syscall. `int dup(int oldfd);`
-Crea una copia de `oldfd` usando el número de fd más bajo disponilble. Tras ejecutarse correctamente ambos file descriptors se refieren al mismo **file descrption**, es decir tienen las mismas *status flags* y el mismo *offset*.
 
-Sin embargo ambos file descriptors no compartes las **file descriptors flags**. En este sentido el **FD_CLOEXEC** flag es off.
+	#include <unistd.h>
+
+	int dup(int oldfd);
+
+
+"Duplicate a file descriptor"
+
+Syscall. Crea una copia de `oldfd` usando el número de fd más bajo disponible. Tras ejecutarse correctamente ambos file descriptors se refieren al mismo **file description**, es decir tienen las mismas *status flags* y el mismo *offset*.
+
+Sin embargo ambos file descriptors no comparten las **file descriptors flags**. En este sentido el **FD_CLOEXEC** (que señala que un file descriptor se debe cerrar cuando se realiza un `exec`) es off. Es decir, que el file descriptor sobrevivirá en el nuevo programa aún después de `exec`. Para mas info, el [manual](https://www.gnu.org/software/libc/manual/html_node/Descriptor-Flags.html#:~:text=Macro%3A%20int%20FD_CLOEXEC%20%C2%B).
 
 ### `dup2`
 
-**<unistd.h>** Syscall. `int dup2(int oldfd, int newfd);`
-Lo mismo que `dup` pero devuelve `newfd`. Si `newfd` ya estaba siendo usado se cierra antes de reusarse. El proceso de cerrarse y reusarse se realizaría `atomicamente`, esto es importatnte, porque implementar la misma fucnionalidad con close y dup estaría sujeto a rece condition, ya que newfd podría ser reusado entre los dos pasos (los hilos comparten la memoria de un proceso y el mismo fd).
+	#include <unistd.h>
+
+	int dup2(int oldfd, int newfd);
+
+Syscall. Lo mismo que `dup`, pero en lugar de coger el número fd más bajo, se usa como argumento el número fd que quiera el usuario. Si `newfd` ya estaba siendo usado se cierra antes de reusarse (cuidado, porque lo hace sin avisar).
+
+El proceso de cerrarse y reusarse se realizaría `atomicamente`, esto es importatnte, porque implementar la misma fucnionalidad con close y dup estaría sujeto a rece condition, ya que newfd podría ser reusado entre los dos pasos (los hilos comparten la memoria de un proceso y el mismo fd).
 
 Si `oldfd` no es valido, la llamada falla y `newfd` no se cierra. Si `oldfd` es un descriptor valido y tiene el mismo valor que `newfd` no se hace nada y se devuelve `newfd`.
 
 ### `execve`
 
-**<unistd.h>** Syscall. `int execve(const char *pathname, char *const argv[], char *const envp[]);`
-Ejecuta el programa referido por `pathname`, que será la ruta al archivo ejecutable. Esto significa que el programa siendo ejecutado por el porceso de llamado es remplazado por un nueo programa, con una nuevo stack, heap y segmento de datos. Dicho de otra forma, se borra toda la info asociada al programa anterior y se inicializan las nuevas areas de memorias para el programa.
+	#include <unistd.h>
 
-`argv` es un array de string con los argumentos por linea de ocmandos del programa. Aunque **no es obligatorio** normalmente el primer valor es el nombre del programa. Además este array debe acabar con `NULL`.
+	int execve(const char *pathname, char *const argv[], char *const envp[]);
 
-`envp` es un array de cadenas, convencionalmente de la forma `"key=value"`, que contiene las **variables de entorno** que el programa usará. También debe acabar en `NULL`.
+Ejecuta el programa referido por `pathname`, que será la ruta al archivo ejecutable.
+
+Esto significa que el programa siendo ejecutado por el porceso de llamado es remplazado por un nuevo programa, con una nuevo stack, heap y segmento de datos. Dicho de otra forma, se borra toda la info asociada al programa anterior y se inicializan las nuevas areas de memorias para el programa.
+
+* `pathname` es la ruta del archivo a ejecutar. Debe ser un ejecutable binario, o un script con simbolos(!#) como los de bash
+
+* `argv` es un array de string con los argumentos por linea de comandos del programa. Aunque **no es obligatorio** normalmente el primer valor es el nombre del programa. Además este array debe acabar con `NULL`. Vamos, que argv[argc] es `NULL`.
+
+* `envp` es un array de strings, convencionalmente de la forma `"key=value"`, que contiene las **variables de entorno** que el programa usará. También debe acabar en `NULL`.
+
+Un ejemplo de implementación: <!-- This is a coment outside-->
+
+
+	execve(
+		"./gnl", /*pathname*/
+		"./gnl", <!--- Primer argumento, que es igual que el pathname -->
+		"Input for GNL", <!--- Segundo argumento, que a su vez es el argv[1] del programa que vamos a ejecutar --->
+		NULL, <!--- Señalamos el final de los argumentos --->
+	)
+
+
 
 Tanto `argv` como `envp` la función `main` del nuevo programa recibirá dichos argumentos. Sin embargo el uso de envp a través de main, si bien está admitido en muchos sistemas, no cumple POSIX, que recomiendo acceder al entorno usado la variable externa `environ` de `<unistd.h>`.
 
-Una cosa chula es que en caso de exito, la función no retorna nunca al programa que le llamo. Ya que el programa anterior y toda su memoría es completamente sustituida por el nuevo programa, que no tendrá registro de como fue llamada.
+Una cosa chula es que, en caso de exito, la función no retorna nunca al programa que le llamó. Ya que el programa anterior y toda su memoria es completamente sustituida por el nuevo programa, que no tendrá registro de como fue llamada.
 
 `execve()` conserva los file descriptor del proceso que lo invoca.
 
-Por últimoo si execve falla, retornará -1 y establecera `errno` con ele error especifico para que se pueda manejar el error.
+Por último si execve falla, retornará -1 y establecera `errno` con el error especifico para que se pueda manejar el error.
+
+Para más info de la familia exec, este [vídeo](https://www.youtube.com/watch?v=OVFEWSP7n8c&ab_channel=CodeVault)
 
 ### `fork()`
 
 **<unistd.h> <sys/types.h>** Syscall. `pid_t fork(void);
 
-Creau un nuevo proceso hijo duplicando el anterior. Ambos procesos corren en especios de memoria separados. Al momento que concluye la llamada a `fork()` ambos espacios de memoria son iguales.
+Crea un nuevo proceso hijo duplicando el anterior. Ambos procesos corren en especios de memoria separados. Al momento que concluye la llamada a `fork()` ambos espacios de memoria son iguales.
 
 * Las únicas diferencias entre el proceso padre y el hijo son:
 
