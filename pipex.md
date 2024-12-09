@@ -30,7 +30,17 @@ Es importante entender que aunque un comando no use el `stdin` para nada, por ej
 
 `>outfile` Esto redirige el `stdout` de comando2 a un archivo llamado `outfile` (se sobreescribe o crea).
 
-Nuestro amigo [CodeVault](https://www.youtube.com/@CodeVault) explica todo en [este video](https://www.youtube.com/watch?v=6xbLgZpOBi8&ab_channel=CodeVault).
+Nuestro amigo [CodeVault](https://www.youtube.com/@CodeVault) explica como reclear un pipe en [este video](https://www.youtube.com/watch?v=6xbLgZpOBi8&ab_channel=CodeVault).
+
+Es un proyecto no muy grande, pero que introduce un montón de conceptos nuevos. Esta lista de reproducción abarca todo lo necesario y más sobre los procesos de UNIX. Pero si quieres ir al grano y empaparte con las nuevas funciones, usa este orden:
+
+* [`exec` y `errno`](https://www.youtube.com/watch?v=OVFEWSP7n8c&ab_channel=CodeVault): como llamar y ejecutar otros procesos dentro de tu programa y gestionar los errores.
+
+* [`fork`](https://www.youtube.com/watch?v=cex9XrZCU14&ab_channel=CodeVault): `exec` sustituye el proceso actual por uno nuevo, por lo que pierdes todo lo que haya después de `exec`... a no ser que dividas el proceso. Bienvenido a la gestión de procesos y cómo duplicarlos para hacer varias llamadas a otros programas.
+
+* [`wait`](https://www.youtube.com/watch?v=tcYo6hipaSA&list=PLfqABt5AS4FkW5mOn2Tn9ZZLLDwA3kZUY&index=2) y [`waitpid`](https://www.youtube.com/watch?v=kCGaRdArSnA): ahora que tenemos procesos en paralelo, tenemos que aprender a ejecutarlos en el orden que queramos.
+
+* [`pipe`](https://www.youtube.com/watch?v=Mqb2dVRe0uo&ab_channel=CodeVault): ahora que ya sabes todo lo necesario sobre procesos, vamos a ver manejo de *file descriptors* y cómo se comunican entre ellos.
 
 ## Funciones permitidas
 
@@ -166,6 +176,99 @@ if (!file)
 	perror("Custom error message");
 ```
 
+### `fork()`
+
+```c
+#include <unistd.h>
+#include <sys/types.h>
+
+pid_t fork(void);
+```
+Crea un nuevo proceso, denominado **hijo** duplicando el anterior, denominado **padre** (*parent and child process*). Devuelve un int que es un ID diferente para cada fork o -1 si ha habido un error. El de *child* siempre será 0, por lo que tenemos que usar este dato para crear variables de control y ver qué programas queremos ejecutar. Un ejemplo.
+
+```c
+pid_t pid = fork();
+
+if (pid < 0) // Error in fork
+	perror("fork");
+else if (pid == 0) // Child process
+	printf("Child process\n");
+else // Parent process
+	printf("Parent process\n");
+```
+Ambos procesos corren en espacios de memoria separados, por lo que genera un nuevo proceso con el que podemos jugar, muy util para las llamadas a `exec`. Ten en cuenta que `fork` se crea desde la línea que se llama, por lo que sucesivas llamadas a `fork` irán creando diferente ramificaciones en un ratio de 2^n, un [arbol binario](https://www.geeksforgeeks.org/fork-and-binary-tree/).
+
+### `wait` y `waitpid`
+
+```c
+#include <sys/types.h>
+#include <sys/wait.h>
+
+pid_t wait(int *wstatus);
+
+pid_t waitpid(pid_t pid, int *wstatus, int options);
+```
+Ahora que tenemos varios procesos, estaría bien elegir en qué orden se van a ejecutar. Si llamamos fork directamente, ambos procesos se van a ejecutar de manera simultanea, lo que puede ser un problema. Por ejemplo, se puede intercalar un printf de un proceso con el otro, mostrando ambos resultados por pantalla a la vez.
+
+`wait` para la ejecución de *parent* hasta que termine la ejecución de *child*, lo cual nos ayuda a escoger el orden de los procesos. `wait` por si misma va a esperar a que acabe el *child* que está activo en el momento, pero puede ser un problema si llamamos a `wait` desde el propio *child* sin otra llamada a `fork`, porque se va a quedar esperando hasta el infinito. Una solución fácil.
+
+```c
+pid_t id = fork();
+
+if (id != 0)
+	wait(NULL);
+```
+`wait` devuelve como valor el id del proceso por el que ha esperado y -1 si no había ningún proceso *child* por el que esperar, también útil para la gestión de los procesos, tal que así:
+
+```c
+pid_t id = fork();
+int wait_id;
+
+wait_id = wait(NULL);
+
+if (wait_id == -1)
+	printf("No children to wait");
+else
+	printf("%d finished execution", wait_id);
+```
+También podemos controlar el fin de un proceso con `errno` y la flag `ECHILD`
+
+```c
+while (wait(NULL) != -1 || errno != ECHILD)
+	printf("waited for a child to finish");
+```
+
+Pero este metodo es demasiado rudimentario para cuando tenemos varios procesos a la vez, ya que `wait` espera al primer *child* que termina de procesarse, no discrimina cual. Ya que no podemos usar `getpid` ni `getppid` (que nos especificarían los id de cada proceso y lo podriamos usar como condición), para solucionarlo tenemos `waitpid`, una variante de `wait` en la que podemos especificar un id en concreto y que hasta que cambio de estado podemos esperar. Sus argumentos son:
+
+* `pid`: la id del proceso en concreto al que queremos esperar, obtenido con `int id = fork()`. Tiene varios valores de entrada.
+
+	* **pid > 0**: espera al id de un *children* específico.
+	* **pid == 0**: espera a por cualquier *children* del mismo grupo del padre.
+	* **pid == -1**: espera a cualquier *children*, independientemente del grupo, al igual que el `wait` original.
+	* **pid < -1**: espera a que termine cualquier *children* del mismo grupo que el padre.
+
+* `wstatus`: el cambio de estatus del proceso al que estamos esperando: el *children* ha terminado, ha sido parado o a reanudado. Se pueden consultar las flags en `<sys/wait.h>` y poner NULL si no se quiere marcar nada, pero algunos comunes.
+
+	* **WIFEXITED**: devuelve distinto de 0 si *children* ha terminado con normalidad, como retorno main o exit.
+
+	* **WIFEXITSTATUS**: devuleve código de salida de *children* si WIFEXITED es verdadero.
+
+	* **WIFSIGNALED**: devuelve un valor si *children* acabó por una señal como SIGTERM o SIGKILL
+
+	* **WIFSTOPPED**: devuelve un número si *children* se ha detenido con señales como SIGSTOP.
+
+* `options`: opciones para modificar el comportamiento de `waitpid` cuando termine *children*, se puede usar 0 para no marcar nada o algunas de estas flags.
+
+	* **WNOHANG**: *No hang*, no bloquea el programa en caso de que no haya *children* que hayan cambiado de estado. Es decir, primero verifica si algún hijo ha cambiado de estado, y si no es así retorna 0 y continua con el programa. Es la más interesante de usar, ya que se puede emplear como un simple check de si un proceso ha terminado o no.
+
+	* **WUNTRACED**: continua con el programa en caso de que un *children* se detenga con alguna señal, como SIGSTOP o SIGSTP, que se envian cuando se pulsa Ctrl+z desde la terminal.
+
+	* **WCONTINUED**: continua con el programa en caso de que se reanude un *children* con señales como SIGCONT.
+
+### `pipe`
+
+Crea un canal  de comunicacióon unidireccional para dos extremos. Uno de lectura y otros de escritura.
+
 ### `access`
 
 ```c
@@ -217,24 +320,7 @@ Si `oldfd` no es valido, la llamada falla y `newfd` no se cierra. Si `oldfd` es 
 
 
 
-### `fork()`
 
-```c
-#include <unistd.h>
-#include <sys/types.h>**
 
-pid_t fork(void);
-```
 
-Crea un nuevo proceso, denominado **hijo** duplicando el anterior, denominado **padre** (*parent and child process*). Ambos procesos corren en especios de memoria separados. Al momento que concluye la llamada a `fork()` ambos espacios de memoria son iguales.
-
-* Las únicas diferencias entre el proceso padre y el hijo son:
-
-* El proceso hijo tiene su propio ID de proceso, y este PID no encaja con ningun grupo de porcoeso o sesión existente.
-
-* El hijo no hereda los locks de memoria del padre.
-
-* `pipe`: Crea un canal  de comunicacióon unidireccional para dos extremos. Uno de lectura y otros de escritura.
 * `unlink`: Elimina un archivo del sistema de archivos (para el manejo de archivos temporales)
-* `wait`: Bloque hasata que un proceso hijo termine, devolviendo su estado.
-* `waitpid`: Similar a wait pero con id.
