@@ -1,5 +1,22 @@
 # Pipex
 
+Índice
+
+- [Subject](#subject)
+- [Explicación](#explicación)
+- [Funciones permitidas](#funciones-permitidas)
+  - [Funciones que ya conocemos](#funciones-que-ya-conocemos)
+  - [`execve` y la familia `exec`](#execve-y-la-familia-exec)
+  - [`errno`, `strerror` y `perror`](#errno-strerror-y-perror)
+  - [`fork()`](#fork)
+  - [`exit` y `abort`](#exit-y-abort)
+  - [`wait` y `waitpid`](#wait-y-waitpid)
+  - [`pipe`](#pipe)
+  - [`access`](#access)
+  - [`dup` y `dup2`](#dup-y-dup2)
+  - [`unlink`](#unlink)
+
+
 ## Subject
 
 `./pipex archivo 1 comando 1 comando2 archivo2`
@@ -46,16 +63,14 @@ Es un proyecto no muy grande, pero que introduce un montón de conceptos nuevos.
 
 ## Funciones permitidas
 
-**Funciones que ya conocemos:**
+### Funciones que ya conocemos:
 
-* `open`: En esta ocasión, vamos a utilizar `open` para crear el fichero en el que vamos a escribir. Para ello podemos usar la flag `O_CREAT`, que permite crear un fichero desde 0 con los permisos necesarios, como `0777`. También podemos usar un biwise `|` con `O_WRONLY` para escribir en el archivo si ya existe o crearlo si no. En resument, usar `open("somefile.txt", O_WRONLY | O_CREAT, 0777)`.
+* `open`: en esta ocasión, vamos a utilizar `open` para crear el fichero en el que vamos a escribir. Para ello podemos usar la flag `O_CREAT`, que permite crear un fichero desde 0 con los permisos necesarios, como `0777`. También podemos usar un biwise `|` con `O_WRONLY` para escribir en el archivo si ya existe o crearlo si no. En resument, usar `open("somefile.txt", O_WRONLY | O_CREAT, 0777)`.
 * `close`
 * `read`
-* `write`: ahora tiene un giro, y es que en lugar de usar el fd 1 para escribir por pantalla, podemos escribir a otros fd. Util para redirigir output desde procesos diferentes. 
+* `write`: ahora tiene un giro, y es que en lugar de usar el fd 1 para escribir por pantalla, podemos escribir a otros fd. Util para redirigir output desde procesos diferentes.
 * `malloc`
 * `free`
-
-**Nuevas funciones:**
 
 ### `execve` y la familia `exec`
 
@@ -210,9 +225,9 @@ void exit(int status);
 
 Termina el proceso actual y cierra todos los fd. Útil para la gestión de errores de `fork` o para controlar sus flujos. Admite dos valores como argumento de entrada:
 
-* *0* o *EXIT_SUCCESS* para indicar que el proceso se cerró según lo esperado. 
+* *0* o *EXIT_SUCCESS* para indicar que el proceso se cerró según lo esperado.
 
-* *1* o *EXIT_FAILURE* para indicar que el proceso se cerró debido a un error. 
+* *1* o *EXIT_FAILURE* para indicar que el proceso se cerró debido a un error.
 
 Siguiendo con el ejemplo anterior:
 
@@ -230,7 +245,7 @@ else // Parent process
 	printf("Parent process\n");
 ```
 
-Aunque no se va a usar en este proyecto, `abort` hace lo mismo pero, a diferencia de `fork`, no cierra los fd. Esto es importante porque, en caso de dump core, `exit` puede llegar a corromper datos si se mete donde no debe. 
+Aunque no se va a usar en este proyecto, `abort` hace lo mismo pero, a diferencia de `fork`, no cierra los fd. Esto es importante porque, en caso de dump core, `exit` puede llegar a corromper datos si se mete donde no debe.
 
 ### `wait` y `waitpid`
 
@@ -304,7 +319,7 @@ Pero este metodo es demasiado rudimentario para cuando tenemos varios procesos a
 
 int pipe(int pipefd[2]);
 ```
-Crea un canal  de comunicacióon unidireccional para dos extremos. Uno de lectura y otros de escritura. Necesita como input un array de dos int que contenga el fd de donde va a leer y el fd de donde va a sacar esa lectura. Podemos pensarlo igual que stdin y stdout, donde 0 es lectura y 1 es escritura. 
+Crea un canal  de comunicacióon unidireccional para dos extremos. Uno de lectura y otros de escritura. Necesita como input un array de dos int que contenga el fd de donde va a leer y el fd de donde va a sacar esa lectura. Podemos pensarlo igual que stdin y stdout, donde 0 es lectura y 1 es escritura.
 
 ```c
 int fd[2];
@@ -317,7 +332,7 @@ int fd[2];
 
 En teoria es muy parecido a la funcion `read`, donde generabamos un fd solo de lectura a partir de un fichero determinado. Con `pipe`, lo que hacemos es conectar dos fd diferentes, uno de lectura (0) y otro de escritura (1);
 
-Para empezar, deberíamos comprobrar que el pipe se ha abierto correctamente, devuelve -1 en caso de error. 
+Para empezar, deberíamos comprobrar que el pipe se ha abierto correctamente, devuelve -1 en caso de error.
 
 ```c
 int fd[2];
@@ -349,9 +364,9 @@ close(fd[0]); // Y cerramos el pipe
 printf("%d", y); // Imprimimos 2 a traves de la variable y.
 ```
 
-Una vez abierto el `pipe`, no hace falta que tengamos que usar los dos extremos. Puede que solo queramos escribir en uno de los fd, por lo que podemos lanzar un `close` para el fd que no usemos. 
+Una vez abierto el `pipe`, no hace falta que tengamos que usar los dos extremos. Puede que solo queramos escribir en uno de los fd, por lo que podemos lanzar un `close` para el fd que no usemos.
 
-Este manejo de `pirpe` es util en multiprocesos. Por ejemplos, en un proceso podemos hacer un write desde fd[1] a fd[0], y en el *parent* leer ese mismo fd. A la hora de hacer un `fork`, hay que tener en cuenta que el pipe se mantiene independiente. Es decir, aunque cerremos el `pipe` en un proceso children, sigue abierto en el parent. Por lo que es importante tenerlos vigilados para no dejar nada sin cerrar. 
+Este manejo de `pirpe` es util en multiprocesos. Por ejemplos, en un proceso podemos hacer un write desde fd[1] a fd[0], y en el *parent* leer ese mismo fd. A la hora de hacer un `fork`, hay que tener en cuenta que el pipe se mantiene independiente. Es decir, aunque cerremos el `pipe` en un proceso children, sigue abierto en el parent. Por lo que es importante tenerlos vigilados para no dejar nada sin cerrar.
 
 ```c
 int	fd[2]; // Abrimos array
@@ -367,7 +382,7 @@ if (pipe(fd) == -1) // Lanzamos pipe y vemos que abra bien
 
 fork_id = fork(); // Dividimos el proceso en parent y child
 if (fork_id == -1) // Variable de control para el fork
-{	
+{
 	perror("fork error");
 	exit(1);
 }
@@ -375,7 +390,7 @@ if (fork_id == -1) // Variable de control para el fork
 if (fork_id == 0) // Entramos en children para asignar el valor a x
 {
 	close(fd[0]); // Cerramos fd[0] ya que no lo vamos a usar en este proceso
-	x = 2; 
+	x = 2;
 	write (fd[1], &x, sizeof(int)); // Hacemos el write en fd[1]...
 	close(fd[1]); // ... y lo cerramos;
 }
@@ -422,25 +437,70 @@ int dup2(int oldfd, int newfd);
 
 "Duplicate a file descriptor"
 
-`dup` crea una copia de cualquier fd y lo asigna al usando el número de fd más bajo disponible. Es decir, que si un `open` un fd de 4, podemos duplicarlo al 5 y hacer otras cosas con el. Por ejemplo. 
+`dup` crea una copia de cualquier fd y lo asigna al usando el número de fd más bajo disponible. Es decir, que si un `open` un fd de 4, podemos duplicarlo al 5 y hacer otras cosas con el. Por ejemplo.
 
+```c
+int fd = open("example.txt", O_WRONLY | O_CREAT 0777); // Abrimos un archivo y le asignamos un fd
+
+int fd_dup = dup(fd); // Duplicamos el fd y escribimos en el
+write(fd, "Hello, ", 7);
+
+write(fd_dup, "world!\n", 7); // Pero tambien podemos escribir en su copia
+
+// Al acabar, example.txt contiene "Hello, world!"
+```
+
+Pero la chicha viene con `dup2`, ya que nos permite copiar un fd y asignarlo **a cualquier otro fd**, incluido `STDOUT`. Repito, incluido `STDOUT`. Por lo que si le asignamos 1 a nuestro fichero, cualquier escritura en `STDOUT` se realizará dentro del fichero que queramos, super útil para el pipex. Por ejemplo.
+
+```c
+int fd = open("output.txt", O_WRONLY | O_CREAT 0777); // Abrimos un fd
+
+dup2(fd, STDOUT_FILENO) // Y sustituimos STDOUT por ese archivo
+
+printf("Este mensaje se guarda en el archivo.\n");
+printf("Cualquier otra salida de printf también irá al archivo.\n");
+
+// Al acabar, output.txt contiene "Este mensaje se guarda en el archivo. Cualquier otra salida de printf también irá al archivo."
+```
+
+Si `oldfd` no es valido, la llamada falla y `newfd` no se cierra. Si `oldfd` es un descriptor valido y tiene el mismo valor que `newfd` no se hace nada y se devuelve `newfd`. Si `newfd` ya estaba siendo usado se cierra antes de reusarse (cuidado, porque lo hace sin avisar).
 
 Tras ejecutarse correctamente ambos file descriptors se refieren al mismo **file description**, es decir tienen las mismas *status flags* y el mismo *offset*.
 
 Sin embargo ambos file descriptors no comparten las **file descriptors flags**. En este sentido el **FD_CLOEXEC** (que señala que un file descriptor se debe cerrar cuando se realiza un `exec`) es off. Es decir, que el file descriptor sobrevivirá en el nuevo programa aún después de `exec`. Para mas info, el [manual](https://www.gnu.org/software/libc/manual/html_node/Descriptor-Flags.html#:~:text=Macro%3A%20int%20FD_CLOEXEC%20%C2%B).
 
-### `dup2`
+El proceso de cerrarse y reusarse se realizaría `atomicamente`, esto es importatnte, porque implementar la misma fucnionalidad con close y dup estaría sujeto a rece condition, ya que newfd podría ser reusado entre los dos pasos (los hilos comparten la memoria de un proceso y el mismo fd).
+
+### `unlink`
 
 ```c
 #include <unistd.h>
 
-int dup2(int oldfd, int newfd);
+int unlink(const char *pathname);
 ```
 
-Syscall. Lo mismo que `dup`, pero en lugar de coger el número fd más bajo, se usa como argumento el número fd que quiera el usuario. Si `newfd` ya estaba siendo usado se cierra antes de reusarse (cuidado, porque lo hace sin avisar).
+En caso de que algo falle, debemos borrar el archivo que hemos creado y en el que hemos intentado escribir. Normalmente usariamos `remove`, pero en este caso usaremos `unlink`. `unlink` Elimina la entrada del directorio marcada por `pathname`, y su contendio en caso de que ningún proceso esté haciendo uso del archivo. Un ejemplo de uso.
 
-El proceso de cerrarse y reusarse se realizaría `atomicamente`, esto es importatnte, porque implementar la misma fucnionalidad con close y dup estaría sujeto a rece condition, ya que newfd podría ser reusado entre los dos pasos (los hilos comparten la memoria de un proceso y el mismo fd).
+```c
+// Abrir el archivo directamente
+    int fd = open("example.txt", O_WRONLY | O_CREAT, 0644);
 
-Si `oldfd` no es valido, la llamada falla y `newfd` no se cierra. Si `oldfd` es un descriptor valido y tiene el mismo valor que `newfd` no se hace nada y se devuelve `newfd`.
+    // Redirigir stdout al archivo
+    dup2(fd, STDOUT_FILENO);
 
-* `unlink`: Elimina un archivo del sistema de archivos (para el manejo de archivos temporales)
+    // Escribir en el archivo usando printf
+    printf("Este texto se escribe en example.txt.\n");
+    printf("Es un ejemplo sin gestión de errores.\n");
+
+    // Cerrar el archivo
+    close(fd);
+
+    // Eliminar el archivo
+    unlink("example.txt");
+```
+
+Devuelve 0 en caso de exito y -1 en caso de error, estableciendo la flag correspondiente de `errno`.
+
+* `EACCES`: Permiso denegado para eliminar el archivo.
+* `ENOENT`: El archivo no existe.
+* `EPERM` o `EISDIR`: Intento de usar unlink en un directorio (no permitido para directorios).
