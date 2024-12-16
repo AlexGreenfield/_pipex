@@ -49,7 +49,7 @@ Es un proyecto no muy grande, pero que introduce un montón de conceptos nuevos.
 * `open`
 * `close`
 * `read`
-* `write`
+* `write`: ahora tiene un giro, y es que en lugar de usar el fd 1 para escribir por pantalla, podemos escribir a otros fd. Util para redirigir output desde procesos diferentes. 
 * `malloc`
 * `free`
 
@@ -196,7 +196,39 @@ else if (pid == 0) // Child process
 else // Parent process
 	printf("Parent process\n");
 ```
-Ambos procesos corren en espacios de memoria separados, por lo que genera un nuevo proceso con el que podemos jugar, muy util para las llamadas a `exec`. Ten en cuenta que `fork` se crea desde la línea que se llama, por lo que sucesivas llamadas a `fork` irán creando diferente ramificaciones en un ratio de 2^n, un [arbol binario](https://www.geeksforgeeks.org/fork-and-binary-tree/).
+Ambos procesos corren en espacios de memoria separados, por lo que genera un nuevo proceso con el que podemos jugar, muy util para las llamadas a `exec`. Ten en cuenta que `fork` se crea desde la línea que se llama, por lo que sucesivas llamadas a `fork` irán creando diferente ramificaciones en un ratio de 2^n, un [arbol binario](https://www.geeksforgeeks.org/fork-and-binary-tree/). Si quieres más, [aquí](https://www.geeksforgeeks.org/fork-system-call/) más info sobre cómo funciona `fork`.
+
+### `exit` y `abort`
+
+```c
+#include <stdlib.h>
+
+void exit(int status);
+```
+
+Termina el proceso actual y cierra todos los fd. Útil para la gestión de errores de `fork` o para controlar sus flujos. Admite dos valores como argumento de entrada:
+
+* *0* o *EXIT_SUCCESS* para indicar que el proceso se cerró según lo esperado. 
+
+* *1* o *EXIT_FAILURE* para indicar que el proceso se cerró debido a un error. 
+
+Siguiendo con el ejemplo anterior:
+
+```c
+pid_t pid = fork();
+
+if (pid < 0) // Error in fork
+{
+	perror("fork");
+	exit(1); // También valdría exit(EXIT_FAILURE)
+}
+else if (pid == 0) // Child process
+	printf("Child process\n");
+else // Parent process
+	printf("Parent process\n");
+```
+
+Aunque no se va a usar en este proyecto, `abort` hace lo mismo pero, a diferencia de `fork`, no cierra los fd. Esto es importante porque, en caso de dump core, `exit` puede llegar a corromper datos si se mete donde no debe. 
 
 ### `wait` y `waitpid`
 
@@ -209,9 +241,7 @@ pid_t wait(int *wstatus);
 pid_t waitpid(pid_t pid, int *wstatus, int options);
 ```
 Ahora que tenemos varios procesos, estaría bien elegir en qué orden se van a ejecutar. Si llamamos fork directamente, ambos procesos se van a ejecutar de manera simultanea, lo que puede ser un problema. Por ejemplo, se puede intercalar un printf de un proceso con el otro, mostrando ambos resultados por pantalla a la vez.
-
 `wait` para la ejecución de *parent* hasta que termine la ejecución de *child*, lo cual nos ayuda a escoger el orden de los procesos. `wait` por si misma va a esperar a que acabe el *child* que está activo en el momento, pero puede ser un problema si llamamos a `wait` desde el propio *child* sin otra llamada a `fork`, porque se va a quedar esperando hasta el infinito. Una solución fácil.
-
 ```c
 pid_t id = fork();
 
@@ -267,7 +297,94 @@ Pero este metodo es demasiado rudimentario para cuando tenemos varios procesos a
 
 ### `pipe`
 
-Crea un canal  de comunicacióon unidireccional para dos extremos. Uno de lectura y otros de escritura.
+```c
+#include <unistd.h>
+
+int pipe(int pipefd[2]);
+```
+Crea un canal  de comunicacióon unidireccional para dos extremos. Uno de lectura y otros de escritura. Necesita como input un array de dos int que contenga el fd de donde va a leer y el fd de donde va a sacar esa lectura. Podemos pensarlo igual que stdin y stdout, donde 0 es lectura y 1 es escritura. 
+
+```c
+int fd[2];
+
+// fd[0] Where to read;
+
+// fd[1] Where to write;
+
+```
+
+En teoria es muy parecido a la funcion `read`, donde generabamos un fd solo de lectura a partir de un fichero determinado. Con `pipe`, lo que hacemos es conectar dos fd diferentes, uno de lectura (0) y otro de escritura (1);
+
+Para empezar, deberíamos comprobrar que el pipe se ha abierto correctamente, devuelve -1 en caso de error. 
+
+```c
+int fd[2];
+
+if (pipe(fd) == -1)
+	printf("error");
+```
+
+Una vez que tenemos el pipe abierto, podemos decirle de escribir en uno de los fd que hemos abierto a otro fd, con llamadas al sistema como `write`. Un ejemplo.
+
+```c
+int	fd[2]; // Abrimos array
+int	x; // Int en desde el que vamos a escribrir
+int y; // Int al que vamos a escribrir a traves del pipe
+
+if (pipe(fd) == -1) // Lanzamos pipe y vemos que abra bien
+{
+	printf("error");
+	return (1);
+}
+
+x = 2; // Asignamos valor a x...
+write (fd[1], &x, sizeof(int)); //... y con el pipe se lo pasamos al fd[0].
+close (fd[1]);// Cerramos uno de los extremos del pipe, ya que no lo vamos a usar.
+
+read(fd[0], &y, sizeof(int)); // Asignamos el 2 de x en y leyendo a través de fd[0], gracias al pipe
+close(fd[0]); // Y cerramos el pipe
+
+printf("%d", y); // Imprimimos 2 a traves de la variable y.
+```
+
+Una vez abierto el `pipe`, no hace falta que tengamos que usar los dos extremos. Puede que solo queramos escribir en uno de los fd, por lo que podemos lanzar un `close` para el fd que no usemos. 
+
+Este manejo de `pirpe` es util en multiprocesos. Por ejemplos, en un proceso podemos hacer un write desde fd[1] a fd[0], y en el *parent* leer ese mismo fd. A la hora de hacer un `fork`, hay que tener en cuenta que el pipe se mantiene independiente. Es decir, aunque cerremos el `pipe` en un proceso children, sigue abierto en el parent. Por lo que es importante tenerlos vigilados para no dejar nada sin cerrar. 
+
+```c
+int	fd[2]; // Abrimos array
+int	x; // Int en desde el que vamos a escribrir
+int y; // Int al que vamos a escribrir a traves del pipe
+int	fork_id; // Variable para el id fork y control de procesos
+
+if (pipe(fd) == -1) // Lanzamos pipe y vemos que abra bien
+{
+	perror("pipe error");
+	return(1);
+}
+
+fork_id = fork(); // Dividimos el proceso en parent y child
+if (fork_id == -1) // Variable de control para el fork
+{	
+	perror("fork error");
+	exit(1);
+}
+
+if (fork_id == 0) // Entramos en children para asignar el valor a x
+{
+	close(fd[0]); // Cerramos fd[0] ya que no lo vamos a usar en este proceso
+	x = 2; 
+	write (fd[1], &x, sizeof(int)); // Hacemos el write en fd[1]...
+	close(fd[1]); // ... y lo cerramos;
+}
+else // En el parent leemos el valor de x en y
+{
+	close (fd[1]); // Cerramos fd[1] ya que no vamos a escribir
+	read (fd[0], &y, sizeof(int)); // Leemos el 2 del fd[0] en y
+	close (fd[0]); // Cerramos el read
+	printf("%d\n", y); // Y nuestro y vale 2!
+}
+```
 
 ### `access`
 
@@ -317,10 +434,5 @@ Syscall. Lo mismo que `dup`, pero en lugar de coger el número fd más bajo, se 
 El proceso de cerrarse y reusarse se realizaría `atomicamente`, esto es importatnte, porque implementar la misma fucnionalidad con close y dup estaría sujeto a rece condition, ya que newfd podría ser reusado entre los dos pasos (los hilos comparten la memoria de un proceso y el mismo fd).
 
 Si `oldfd` no es valido, la llamada falla y `newfd` no se cierra. Si `oldfd` es un descriptor valido y tiene el mismo valor que `newfd` no se hace nada y se devuelve `newfd`.
-
-
-
-
-
 
 * `unlink`: Elimina un archivo del sistema de archivos (para el manejo de archivos temporales)
