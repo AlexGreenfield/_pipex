@@ -4,6 +4,7 @@
 
 - [Subject](#subject)
 - [Explicación](#explicación)
+- [Teoría file descriptors](#teoría-file-descriptors)
 - [Funciones permitidas](#funciones-permitidas)
   - [Funciones que ya conocemos](#funciones-que-ya-conocemos)
   - [`execve` y la familia `exec`](#execve-y-la-familia-exec)
@@ -60,6 +61,16 @@ Es un proyecto no muy grande, pero que introduce un montón de conceptos nuevos.
 * [`pipe`](https://www.youtube.com/watch?v=Mqb2dVRe0uo&ab_channel=CodeVault): ahora que ya sabes todo lo necesario sobre procesos, vamos a ver manejo de *file descriptors* y cómo se comunican entre ellos.
 
 * [`dup` y `dup2`](https://www.youtube.com/watch?v=5fnVr-zH-SE): ahora que ya tenemos todo lo necesario sobre procesos y demás, vamos a ver cómo duplicar un fd y cambiar STDOUT a un archivo en concreto.
+
+## Teoría file descriptors.
+
+Son números enteros que usa cada proceso para referirse a archivos.
+
+Las **descripciones de archivo abiertas** son estrucuras internas del kernnel que contienen al informacións obre el archivo abierto como el *offset* y las flags de archivo (modo lectura/escritura).
+
+Aunque distintos descriptores de archivo pueden apuntar al mismo open file description, luego tienen sus flags especificos, los llamadas **file descriptor flags**. Estas flags no perteneces a las descripciones de archivos así que no se comparten al hacer `dup`, por ejemplo.
+
+Un descriptor de archivo importante para pipex es **FD_CLOEXEC** (Close On Exec) que indica si el descriptor debe cerrarse automaticamente después de que se ejecute un proceso con `execve`.
 
 ## Funciones permitidas
 
