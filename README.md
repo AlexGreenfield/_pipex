@@ -76,7 +76,7 @@ Un descriptor de archivo importante para pipex es **FD_CLOEXEC** (Close On Exec)
 
 ### Funciones que ya conocemos:
 
-* `open`: en esta ocasión, vamos a utilizar `open` para crear el fichero en el que vamos a escribir. Para ello podemos usar la flag `O_CREAT`, que permite crear un fichero desde 0 con los permisos necesarios, como `0777`. También podemos usar un biwise `|` con `O_WRONLY` para escribir en el archivo si ya existe o crearlo si no. En resument, usar `open("somefile.txt", O_WRONLY | O_CREAT, 0777)`.
+* `open`: en esta ocasión, vamos a utilizar `open` para crear el fichero en el que vamos a escribir. Para ello podemos usar la flag `O_CREAT`, que permite crear un fichero desde 0 con los permisos necesarios, como `0777`. También podemos usar un biwise `|` con `O_WRONLY` para escribir en el archivo si ya existe o crearlo si no. En resument, usar `open("somefile.txt", O_WRONLY | O_CREAT | O_TRUNC, 0644)`.
 * `close`
 * `read`
 * `write`: ahora tiene un giro, y es que en lugar de usar el fd 1 para escribir por pantalla, podemos escribir a otros fd. Util para redirigir output desde procesos diferentes.
@@ -515,3 +515,189 @@ Devuelve 0 en caso de exito y -1 en caso de error, estableciendo la flag corresp
 * `EACCES`: Permiso denegado para eliminar el archivo.
 * `ENOENT`: El archivo no existe.
 * `EPERM` o `EISDIR`: Intento de usar unlink en un directorio (no permitido para directorios).
+
+## Implementación básica
+
+Ahora que ya hemos visto las funciones principales de nuestro pipex, vamos a realizar una implementación básica. Pongamos que queremos replicar el siguiente comando.
+
+```
+ping -c 5 google.com | grep rtt
+```
+
+Vamos a entender un poco el proceso que seguiría este comando.
+
+1. El comando `ping` lanza una llamada a Google y escribe la respuesta en STDOUT
+2. En lugar de pasar por STDOUT, el simbolo `|` recoge esa salida y la pasa al siguiente comando, `grep`
+3. `grep`, en lugar de leer de STDINT, lee del texto que le ha pasado `|`
+
+Ahora, para recrear ese proceso en C, debemos hacer el siguiente orden.
+
+1. Crear un `pipe` con dos fd diferentes, uno de lectura y otro de escritura.
+2. Creamos dos procesos (*child*) diferentes
+	1. Uno que ejecute el comando `ping` y escribe en fd[1] en lugar de STDOUT.
+	2. Otro que ejecute el comando `grep` y lea de fd[0] en lugar de STDIN.
+3. Un proceso final que espere a que los otros dos *child* se ejecuten en el orden correcto y cierre el *parent*.
+
+Aqui hay un ejemplo con `execlp` (recuerda que debemos usar `execve`).
+
+```c
+#include <unistd.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/wait.h>
+
+int main() {
+    int fd[2]; // Creamos el pipe y comprobamos el caso de error
+    if (pipe(fd) == -1) {
+        perror("pipe");
+        return 1;
+    }
+
+    int pid1 = fork(); // Creamos el primer fork para `ping` y comprobamos el error
+    if (pid1 < 0) {
+        perror("fork pid1");
+        return 2;
+    }
+
+    if (pid1 == 0) { // Proceso hijo 1: ejecuta `ping`
+        close(fd[0]); // Cerramos el extremo de lectura del pipe
+        dup2(fd[1], STDOUT_FILENO); // Redirigimos la salida estándar al extremo de escritura del pipe
+        close(fd[1]); // Cerramos el extremo de escritura duplicado
+        execlp("ping", "ping", "-c", "5", "google.com", NULL); // Ejecutamos `ping`
+        perror("execlp ping"); // Si execlp falla
+        exit(1); // Terminamos el hijo con error
+    }
+
+    int pid2 = fork(); // Creamos el segundo fork para `grep` y comprobamos el error
+    if (pid2 < 0) {
+        perror("fork pid2");
+        return 3;
+    }
+
+    if (pid2 == 0) { // Proceso hijo 2: ejecuta `grep`
+        close(fd[1]); // Cerramos el extremo de escritura del pipe
+        dup2(fd[0], STDIN_FILENO); // Redirigimos la entrada estándar al extremo de lectura del pipe
+        close(fd[0]); // Cerramos el extremo de lectura duplicado
+        execlp("grep", "grep", "rtt", NULL); // Ejecutamos `grep`
+        perror("execlp grep"); // Si execlp falla
+        exit(1); // Terminamos el hijo con error
+    }
+
+    // En el proceso padre cerramos ambos extremos del pipe
+    close(fd[0]);
+    close(fd[1]);
+
+    // Esperamos a que ambos procesos hijos terminen
+    waitpid(pid1, NULL, 0);
+    waitpid(pid2, NULL, 0);
+
+    return 0; // Todo ha salido bien
+}
+```
+
+Ahora, si queremos lanzar este programa con un argumento desde la consola, debemos añadir las funcionalidades de `open` y tener en cuenta los argumentos (una vez más, este ejemplo usa `execlp` en lugar de `execve`).
+
+```c
+#include <unistd.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/wait.h>
+#include <fcntl.h>
+
+int main(int argc, char **argv)
+{
+    int fd[2]; // Pipe entre los dos comandos
+    int file_in, file_out; // Descriptores para archivo1 y archivo2
+    int pid1, pid2;
+
+    // Verificar número de argumentos
+    if (argc != 5)
+    {
+        write(2, "Usage: ./pipex file1 cmd1 cmd2 file2\n", 36);
+        return (1);
+    }
+
+    // Abrir archivo1 (modo lectura) y archivo2 (modo escritura)
+    file_in = open(argv[1], O_RDONLY);
+    if (file_in < 0)
+    {
+        perror("Error opening file1");
+        return (1);
+    }
+
+    file_out = open(argv[4], O_WRONLY | O_CREAT | O_TRUNC, 0644);
+    if (file_out < 0)
+    {
+        perror("Error opening file2");
+        close(file_in);
+        return (1);
+    }
+
+    // Crear el pipe y verificar errores
+    if (pipe(fd) == -1)
+    {
+        perror("Pipe failed");
+        close(file_in);
+        close(file_out);
+        return (1);
+    }
+
+    // Primer fork para ejecutar comando1
+    pid1 = fork();
+    if (pid1 < 0)
+    {
+        perror("Fork failed");
+        close(file_in);
+        close(file_out);
+        return (1);
+    }
+
+    if (pid1 == 0) // Proceso hijo 1
+    {
+        dup2(file_in, STDIN_FILENO); // Redirigir STDIN desde archivo1
+        dup2(fd[1], STDOUT_FILENO); // Redirigir STDOUT al pipe de escritura
+        close(fd[0]); // Cerrar el extremo de lectura del pipe
+        close(fd[1]);
+        close(file_in);
+        close(file_out);
+        execlp("/bin/sh", "sh", "-c", argv[2], NULL); // Ejecutar comando1
+        perror("Error executing cmd1");
+        exit(1);
+    }
+
+    // Segundo fork para ejecutar comando2
+    pid2 = fork();
+    if (pid2 < 0)
+    {
+        perror("Fork failed");
+        close(file_in);
+        close(file_out);
+        return (1);
+    }
+
+    if (pid2 == 0) // Proceso hijo 2
+    {
+        dup2(fd[0], STDIN_FILENO); // Redirigir STDIN desde el pipe de lectura
+        dup2(file_out, STDOUT_FILENO); // Redirigir STDOUT hacia archivo2
+        close(fd[0]);
+        close(fd[1]);
+        close(file_in);
+        close(file_out);
+        execlp("/bin/sh", "sh", "-c", argv[3], NULL); // Ejecutar comando2
+        perror("Error executing cmd2");
+        exit(1);
+    }
+
+    // Código del proceso padre
+    close(fd[0]); // Cerrar extremos del pipe
+    close(fd[1]);
+    close(file_in); // Cerrar archivo1
+    close(file_out); // Cerrar archivo2
+
+    waitpid(pid1, NULL, 0); // Esperar a que termine el primer hijo
+    waitpid(pid2, NULL, 0); // Esperar a que termine el segundo hijo
+
+    return (0); // Todo ha salido bien
+}
+```
+
