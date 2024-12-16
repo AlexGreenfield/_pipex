@@ -42,11 +42,13 @@ Es un proyecto no muy grande, pero que introduce un montón de conceptos nuevos.
 
 * [`pipe`](https://www.youtube.com/watch?v=Mqb2dVRe0uo&ab_channel=CodeVault): ahora que ya sabes todo lo necesario sobre procesos, vamos a ver manejo de *file descriptors* y cómo se comunican entre ellos.
 
+* [`dup` y `dup2`](https://www.youtube.com/watch?v=5fnVr-zH-SE): ahora que ya tenemos todo lo necesario sobre procesos y demás, vamos a ver cómo duplicar un fd y cambiar STDOUT a un archivo en concreto.
+
 ## Funciones permitidas
 
 **Funciones que ya conocemos:**
 
-* `open`
+* `open`: En esta ocasión, vamos a utilizar `open` para crear el fichero en el que vamos a escribir. Para ello podemos usar la flag `O_CREAT`, que permite crear un fichero desde 0 con los permisos necesarios, como `0777`. También podemos usar un biwise `|` con `O_WRONLY` para escribir en el archivo si ya existe o crearlo si no. En resument, usar `open("somefile.txt", O_WRONLY | O_CREAT, 0777)`.
 * `close`
 * `read`
 * `write`: ahora tiene un giro, y es que en lugar de usar el fd 1 para escribir por pantalla, podemos escribir a otros fd. Util para redirigir output desde procesos diferentes. 
@@ -406,18 +408,24 @@ if (access("rwfile", R_OK|W_OK) == 0)
 
 La idea es llamarla antes de `execve` para comprobar si un archivo existe y es ejecutable.
 
-### `dup`
+### `dup` y `dup2`
+
+Para sacar el resultado de nuestro programa a un archivo en concreto en lugar de una terminal, necesitamos usar `dup` y `dup2`
 
 ```c
 #include <unistd.h>
 
 int dup(int oldfd);
-```
 
+int dup2(int oldfd, int newfd);
+```
 
 "Duplicate a file descriptor"
 
-Syscall. Crea una copia de `oldfd` usando el número de fd más bajo disponible. Tras ejecutarse correctamente ambos file descriptors se refieren al mismo **file description**, es decir tienen las mismas *status flags* y el mismo *offset*.
+`dup` crea una copia de cualquier fd y lo asigna al usando el número de fd más bajo disponible. Es decir, que si un `open` un fd de 4, podemos duplicarlo al 5 y hacer otras cosas con el. Por ejemplo. 
+
+
+Tras ejecutarse correctamente ambos file descriptors se refieren al mismo **file description**, es decir tienen las mismas *status flags* y el mismo *offset*.
 
 Sin embargo ambos file descriptors no comparten las **file descriptors flags**. En este sentido el **FD_CLOEXEC** (que señala que un file descriptor se debe cerrar cuando se realiza un `exec`) es off. Es decir, que el file descriptor sobrevivirá en el nuevo programa aún después de `exec`. Para mas info, el [manual](https://www.gnu.org/software/libc/manual/html_node/Descriptor-Flags.html#:~:text=Macro%3A%20int%20FD_CLOEXEC%20%C2%B).
 
