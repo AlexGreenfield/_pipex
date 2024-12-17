@@ -16,6 +16,7 @@
   - [`access`](#access)
   - [`dup` y `dup2`](#dup-y-dup2)
   - [`unlink`](#unlink)
+- [Implementación básica](#implementación-básica)
 
 
 ## Subject
