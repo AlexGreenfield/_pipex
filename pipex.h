@@ -6,7 +6,7 @@
 /*   By: acastrov <acastrov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/17 18:24:11 by acastrov          #+#    #+#             */
-/*   Updated: 2024/12/17 20:56:08 by acastrov         ###   ########.fr       */
+/*   Updated: 2024/12/18 19:42:21 by acastrov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@
 # include <unistd.h>
 # include <sys/types.h>
 # include <sys/wait.h>
+# include "libft/libft.h"
 
 // Main pipes
 int		ft_pipex(char **argv);

@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   pipex.c                                            :+:      :+:    :+:   */
+/*   basic_pipex.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: acastrov <acastrov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/17 17:59:58 by acastrov          #+#    #+#             */
-/*   Updated: 2024/12/18 19:43:05 by acastrov         ###   ########.fr       */
+/*   Updated: 2024/12/18 19:26:24 by acastrov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,8 @@
 int			ft_pipex(char **argv);
 static int	child_1(char **argv, int *fd, int *file_in, int *file_out);
 static int	child_2(char **argv, int *fd, int *file_in, int *file_out);
+int			ft_check_pipex(char **argv, int *fd, int *file_in, int *file_out);
+void		ft_close_all(int *fd, int *file_in, int *file_out);
 
 int	ft_pipex(char **argv)
 {
@@ -92,4 +94,37 @@ static int	child_2(char **argv, int *fd, int *file_in, int *file_out)
 	ft_close_all(fd, file_in, file_out);
 	waitpid(pid2, NULL, 0);
 	return (0);
+}
+
+int	ft_check_pipex(char **argv, int *fd, int *file_in, int *file_out)
+{
+	*file_in = open(argv[1], O_RDONLY);
+	if (*file_in < 0)
+	{
+		perror("Error opening file1");
+		return (1);
+	}
+	*file_out = open(argv[4], O_WRONLY | O_CREAT | O_TRUNC, 0644);
+	if (*file_out < 0)
+	{
+		perror("Error opening file2");
+		close(*file_in);
+		return (2);
+	}
+	if (pipe(fd) == -1)
+	{
+		perror("Pipe failed");
+		close(*file_in);
+		close(*file_out);
+		return (3);
+	}
+	return (0);
+}
+
+void	ft_close_all(int *fd, int *file_in, int *file_out)
+{
+	close (fd[0]);
+	close (fd[1]);
+	close(*file_in);
+	close(*file_out);
 }
