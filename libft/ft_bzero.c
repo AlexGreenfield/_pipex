@@ -1,23 +1,18 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.c                                             :+:      :+:    :+:   */
+/*   ft_bzero.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: acastrov <acastrov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/12/17 19:31:21 by acastrov          #+#    #+#             */
-/*   Updated: 2024/12/18 18:44:10 by acastrov         ###   ########.fr       */
+/*   Created: 2024/09/18 19:13:21 by acastrov          #+#    #+#             */
+/*   Updated: 2024/10/01 16:02:03 by acastrov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "pipex.h"
-
-int	main(int argc, char **argv)
+#include "libft.h"
+// Wipes memory direction and fills with 0 via calling memset
+void	ft_bzero(void *s, size_t n)
 {
-	if (argc == 5)
-	{
-		if (ft_pipex(argv) == 0)
-			printf("Exito en pipex\n");
-	}
-	return (0);
+	ft_memset(s, 0, n);
 }

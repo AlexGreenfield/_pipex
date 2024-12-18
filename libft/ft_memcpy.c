@@ -1,23 +1,25 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.c                                             :+:      :+:    :+:   */
+/*   ft_memcpy.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: acastrov <acastrov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/12/17 19:31:21 by acastrov          #+#    #+#             */
-/*   Updated: 2024/12/18 18:44:10 by acastrov         ###   ########.fr       */
+/*   Created: 2024/09/19 15:57:19 by acastrov          #+#    #+#             */
+/*   Updated: 2024/10/01 16:09:51 by acastrov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "pipex.h"
-
-int	main(int argc, char **argv)
+#include "libft.h"
+// Copy memory value in a new area
+void	*ft_memcpy(void *dest, const void *src, size_t n)
 {
-	if (argc == 5)
-	{
-		if (ft_pipex(argv) == 0)
-			printf("Exito en pipex\n");
-	}
-	return (0);
+	unsigned char	*return_pointer;
+
+	if (dest == NULL && src == NULL)
+		return (NULL);
+	return_pointer = (unsigned char *)dest;
+	while (n--)
+		*return_pointer++ = *(unsigned char *)src++;
+	return (dest);
 }

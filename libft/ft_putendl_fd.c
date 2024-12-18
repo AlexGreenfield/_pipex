@@ -1,23 +1,22 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.c                                             :+:      :+:    :+:   */
+/*   ft_putendl_fd.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: acastrov <acastrov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/12/17 19:31:21 by acastrov          #+#    #+#             */
-/*   Updated: 2024/12/18 18:44:10 by acastrov         ###   ########.fr       */
+/*   Created: 2024/09/30 18:50:50 by acastrov          #+#    #+#             */
+/*   Updated: 2024/10/01 16:18:44 by acastrov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "pipex.h"
-
-int	main(int argc, char **argv)
+#include "libft.h"
+// Call to write with an string an a line jump, variable file descriptor
+void	ft_putendl_fd(char *s, int fd)
 {
-	if (argc == 5)
+	if (s != NULL)
 	{
-		if (ft_pipex(argv) == 0)
-			printf("Exito en pipex\n");
+		write(fd, s, ft_strlen(s));
+		write(fd, "\n", 1);
 	}
-	return (0);
 }

@@ -1,23 +1,21 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.c                                             :+:      :+:    :+:   */
+/*   ft_lstdelone_bonus.c                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: acastrov <acastrov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/12/17 19:31:21 by acastrov          #+#    #+#             */
-/*   Updated: 2024/12/18 18:44:10 by acastrov         ###   ########.fr       */
+/*   Created: 2024/10/03 17:05:49 by acastrov          #+#    #+#             */
+/*   Updated: 2024/10/03 17:41:54 by acastrov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "pipex.h"
-
-int	main(int argc, char **argv)
+#include "libft.h"
+// Deletes de content of one node with f ft and frees it
+void	ft_lstdelone(t_list *lst, void (*del)(void *))
 {
-	if (argc == 5)
-	{
-		if (ft_pipex(argv) == 0)
-			printf("Exito en pipex\n");
-	}
-	return (0);
+	if (!lst || !del)
+		return ;
+	del(lst->content);
+	free(lst);
 }

@@ -1,23 +1,22 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.c                                             :+:      :+:    :+:   */
+/*   ft_lstadd_front_bonus.c                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: acastrov <acastrov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/12/17 19:31:21 by acastrov          #+#    #+#             */
-/*   Updated: 2024/12/18 18:44:10 by acastrov         ###   ########.fr       */
+/*   Created: 2024/10/03 16:57:34 by acastrov          #+#    #+#             */
+/*   Updated: 2024/10/03 17:40:30 by acastrov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "pipex.h"
-
-int	main(int argc, char **argv)
+#include "libft.h"
+// Adds a node to the beginning of a list
+void	ft_lstadd_front(t_list **lst, t_list *new)
 {
-	if (argc == 5)
+	if (new)
 	{
-		if (ft_pipex(argv) == 0)
-			printf("Exito en pipex\n");
+		new->next = *lst;
+		*lst = new;
 	}
-	return (0);
 }

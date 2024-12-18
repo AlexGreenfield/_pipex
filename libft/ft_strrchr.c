@@ -1,23 +1,28 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.c                                             :+:      :+:    :+:   */
+/*   ft_strrchr.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: acastrov <acastrov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/12/17 19:31:21 by acastrov          #+#    #+#             */
-/*   Updated: 2024/12/18 18:44:10 by acastrov         ###   ########.fr       */
+/*   Created: 2024/09/23 20:43:36 by acastrov          #+#    #+#             */
+/*   Updated: 2024/09/28 21:09:07 by acastrov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "pipex.h"
-
-int	main(int argc, char **argv)
+#include "libft.h"
+// Locates last char in a string
+char	*ft_strrchr(const char *s, int c)
 {
-	if (argc == 5)
+	char	*new_string;
+
+	new_string = (char *)s;
+	new_string += ft_strlen(s);
+	while (new_string >= s)
 	{
-		if (ft_pipex(argv) == 0)
-			printf("Exito en pipex\n");
+		if (*new_string == (char)c)
+			return (new_string);
+		new_string--;
 	}
-	return (0);
+	return (NULL);
 }

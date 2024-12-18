@@ -1,23 +1,29 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.c                                             :+:      :+:    :+:   */
+/*   ft_strchr.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: acastrov <acastrov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/12/17 19:31:21 by acastrov          #+#    #+#             */
-/*   Updated: 2024/12/18 18:44:10 by acastrov         ###   ########.fr       */
+/*   Created: 2024/09/18 16:35:27 by acastrov          #+#    #+#             */
+/*   Updated: 2024/10/01 16:49:57 by acastrov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "pipex.h"
-
-int	main(int argc, char **argv)
+#include "libft.h"
+// Locates first char in a string
+char	*ft_strchr(const char *s, int c)
 {
-	if (argc == 5)
+	char	*c_find_pointer;
+
+	c_find_pointer = (char *)s;
+	while (*c_find_pointer)
 	{
-		if (ft_pipex(argv) == 0)
-			printf("Exito en pipex\n");
+		if (*c_find_pointer == (char)c)
+			return ((char *)c_find_pointer);
+		c_find_pointer++;
 	}
-	return (0);
+	if ((char)c == '\0')
+		return ((char *)c_find_pointer);
+	return (NULL);
 }

@@ -1,23 +1,20 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.c                                             :+:      :+:    :+:   */
+/*   ft_isprint.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: acastrov <acastrov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/12/17 19:31:21 by acastrov          #+#    #+#             */
-/*   Updated: 2024/12/18 18:44:10 by acastrov         ###   ########.fr       */
+/*   Created: 2024/09/17 19:05:01 by acastrov          #+#    #+#             */
+/*   Updated: 2024/10/01 16:07:32 by acastrov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "pipex.h"
-
-int	main(int argc, char **argv)
+#include "libft.h"
+// Checks if a char(ASCII value) is printable 7-bit ASCII
+int	ft_isprint(int c)
 {
-	if (argc == 5)
-	{
-		if (ft_pipex(argv) == 0)
-			printf("Exito en pipex\n");
-	}
+	if (c >= 32 && c <= 126)
+		return (c);
 	return (0);
 }

@@ -1,23 +1,26 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.c                                             :+:      :+:    :+:   */
+/*   ft_lstclear_bonus.c                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: acastrov <acastrov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/12/17 19:31:21 by acastrov          #+#    #+#             */
-/*   Updated: 2024/12/18 18:44:10 by acastrov         ###   ########.fr       */
+/*   Created: 2024/10/03 17:16:14 by acastrov          #+#    #+#             */
+/*   Updated: 2024/10/03 17:53:06 by acastrov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "pipex.h"
-
-int	main(int argc, char **argv)
+#include "libft.h"
+// Clears the content of every node in a list with f ft and frees it
+void	ft_lstclear(t_list **lst, void (*del)(void *))
 {
-	if (argc == 5)
+	t_list	*delete_previous;
+
+	while (*lst)
 	{
-		if (ft_pipex(argv) == 0)
-			printf("Exito en pipex\n");
+		delete_previous = *lst;
+		del((*lst)->content);
+		*lst = (*lst)->next;
+		free(delete_previous);
 	}
-	return (0);
 }

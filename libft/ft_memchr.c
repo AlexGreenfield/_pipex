@@ -1,23 +1,27 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.c                                             :+:      :+:    :+:   */
+/*   ft_memchr.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: acastrov <acastrov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/12/17 19:31:21 by acastrov          #+#    #+#             */
-/*   Updated: 2024/12/18 18:44:10 by acastrov         ###   ########.fr       */
+/*   Created: 2024/09/18 19:21:38 by acastrov          #+#    #+#             */
+/*   Updated: 2024/10/01 16:08:15 by acastrov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "pipex.h"
-
-int	main(int argc, char **argv)
+#include <string.h>
+// Scan memory for a char
+void	*ft_memchr(const void *s, int c, size_t n)
 {
-	if (argc == 5)
+	unsigned char	*return_pointer;
+
+	return_pointer = (unsigned char *)s;
+	while (n--)
 	{
-		if (ft_pipex(argv) == 0)
-			printf("Exito en pipex\n");
+		if (*return_pointer == (unsigned char)c)
+			return (return_pointer);
+		return_pointer++;
 	}
-	return (0);
+	return (NULL);
 }

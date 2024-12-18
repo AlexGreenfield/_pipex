@@ -1,23 +1,30 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.c                                             :+:      :+:    :+:   */
+/*   ft_strnstr.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: acastrov <acastrov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/12/17 19:31:21 by acastrov          #+#    #+#             */
-/*   Updated: 2024/12/18 18:44:10 by acastrov         ###   ########.fr       */
+/*   Created: 2024/09/19 20:24:45 by acastrov          #+#    #+#             */
+/*   Updated: 2024/10/01 16:44:18 by acastrov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "pipex.h"
-
-int	main(int argc, char **argv)
+#include "libft.h"
+// Locates a substring in a string
+char	*ft_strnstr(const char *big, const char *little, size_t len)
 {
-	if (argc == 5)
+	size_t	little_len;
+
+	if (*little == '\0')
+		return ((char *)big);
+	little_len = ft_strlen(little);
+	while (*big && len >= little_len)
 	{
-		if (ft_pipex(argv) == 0)
-			printf("Exito en pipex\n");
+		if (ft_strncmp(big, little, little_len) == 0)
+			return ((char *)big);
+		len--;
+		big++;
 	}
-	return (0);
+	return (NULL);
 }

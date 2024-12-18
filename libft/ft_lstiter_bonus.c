@@ -1,23 +1,22 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.c                                             :+:      :+:    :+:   */
+/*   ft_lstiter_bonus.c                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: acastrov <acastrov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/12/17 19:31:21 by acastrov          #+#    #+#             */
-/*   Updated: 2024/12/18 18:44:10 by acastrov         ###   ########.fr       */
+/*   Created: 2024/10/03 17:30:58 by acastrov          #+#    #+#             */
+/*   Updated: 2024/10/03 17:42:29 by acastrov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "pipex.h"
-
-int	main(int argc, char **argv)
+#include "libft.h"
+// Applies f ft to every node of a list
+void	ft_lstiter(t_list *lst, void (*f)(void *))
 {
-	if (argc == 5)
+	while (lst)
 	{
-		if (ft_pipex(argv) == 0)
-			printf("Exito en pipex\n");
+		f(lst->content);
+		lst = lst->next;
 	}
-	return (0);
 }

@@ -1,23 +1,30 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.c                                             :+:      :+:    :+:   */
+/*   ft_memcmp.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: acastrov <acastrov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/12/17 19:31:21 by acastrov          #+#    #+#             */
-/*   Updated: 2024/12/18 18:44:10 by acastrov         ###   ########.fr       */
+/*   Created: 2024/09/19 16:10:11 by acastrov          #+#    #+#             */
+/*   Updated: 2024/10/01 16:08:53 by acastrov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "pipex.h"
-
-int	main(int argc, char **argv)
+#include "libft.h"
+// Compare memory areas and returns value difference
+int	ft_memcmp(const void *s1, const void *s2, size_t n)
 {
-	if (argc == 5)
+	unsigned char	*s1_copy;
+	unsigned char	*s2_copy;
+
+	s1_copy = (unsigned char *)s1;
+	s2_copy = (unsigned char *)s2;
+	while (n--)
 	{
-		if (ft_pipex(argv) == 0)
-			printf("Exito en pipex\n");
+		if (*s1_copy != *s2_copy)
+			return (*s1_copy - *s2_copy);
+		s1_copy++;
+		s2_copy++;
 	}
 	return (0);
 }
