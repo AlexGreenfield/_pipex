@@ -1,13 +1,1 @@
-total 2028
-drwxr-xr-x 3 acastrov 2024_madrid    4096 Dec 17 17:48 actual_libft
--rwxr-xr-x 1 acastrov 2024_madrid   19008 Dec 17 21:06 a.out
--rw-r--r-- 1 acastrov 2024_madrid 1591512 Dec  7 17:44 es.subject.pdf
--rw-r--r-- 1 acastrov 2024_madrid      30 Dec 17 18:30 infile
--rw-r--r-- 1 acastrov 2024_madrid    1030 Dec 17 19:31 main.c
--rwx------ 1 acastrov 2024_madrid       0 Dec 17 21:06 outfile
--rw-r--r-- 1 acastrov 2024_madrid    2629 Dec 17 21:06 pipex.c
--rw-r--r-- 1 acastrov 2024_madrid    1549 Dec 17 20:38 pipex_checks.c
--rw-r--r-- 1 acastrov 2024_madrid    1070 Dec 17 20:32 pipex_close.c
--rw-r--r-- 1 acastrov 2024_madrid    1348 Dec 17 20:56 pipex.h
--rw-r--r-- 1 acastrov 2024_madrid  400432 Dec 17 18:56 pipex.h.gch
--rw-r--r-- 1 acastrov 2024_madrid   30277 Dec 16 21:34 README.md
+13

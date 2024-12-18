@@ -6,15 +6,15 @@
 /*   By: acastrov <acastrov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/17 17:59:58 by acastrov          #+#    #+#             */
-/*   Updated: 2024/12/17 21:06:25 by acastrov         ###   ########.fr       */
+/*   Updated: 2024/12/18 16:55:31 by acastrov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 
 int			ft_pipex(char **argv);
-static int	ft_pipex_1(char **argv, int *fd, int *file_in, int *file_out);
-static int	ft_pipex_2(char **argv, int *fd, int *file_in, int *file_out);
+static int	child_1(char **argv, int *fd, int *file_in, int *file_out);
+static int	child_2(char **argv, int *fd, int *file_in, int *file_out);
 
 int	ft_pipex(char **argv)
 {
@@ -24,22 +24,20 @@ int	ft_pipex(char **argv)
 
 	if (ft_check_pipex(argv, fd, &file_in, &file_out) != 0)
 		return (1);
-	if (ft_pipex_1(argv, fd, &file_in, &file_out) != 0)
+	if (child_1(argv, fd, &file_in, &file_out) != 0)
 	{
 		ft_close_all(fd, &file_in, &file_out);
 		return (1);
 	}
-	/*if (ft_pipex_2(argv, fd, &file_in, &file_out) != 0)
+	if (child_2(argv, fd, &file_in, &file_out) != 0)
 	{
 		ft_close_all(fd, &file_in, &file_out);
 		return (1);
-	}*/
-	printf("File in is %d", file_in);
-	ft_close_all(fd, &file_in, &file_out);
+	}
 	return (0);
 }
 
-static int	ft_pipex_1(char **argv, int *fd, int *file_in, int *file_out)
+static int	child_1(char **argv, int *fd, int *file_in, int *file_out)
 {
 	int	pid1;
 
@@ -67,7 +65,7 @@ static int	ft_pipex_1(char **argv, int *fd, int *file_in, int *file_out)
 	return (0);
 }
 
-static int	ft_pipex_2(char **argv, int *fd, int *file_in, int *file_out)
+static int	child_2(char **argv, int *fd, int *file_in, int *file_out)
 {
 	int	pid2;
 
@@ -91,6 +89,7 @@ static int	ft_pipex_2(char **argv, int *fd, int *file_in, int *file_out)
 		perror("Error executing cmd2");
 		exit(1);
 	}
+	ft_close_all(fd, file_in, file_out);
 	waitpid(pid2, NULL, 0);
 	return (0);
 }
