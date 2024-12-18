@@ -433,7 +433,7 @@ if (access("rwfile", R_OK|W_OK) == 0)
 	printf("rwfile is accessible in writing and reading mode\n");
 ```
 
-La idea es llamarla antes de `execve` para comprobar si un archivo existe y es ejecutable.
+La idea es llamarla antes de `execve` para comprobar si un archivo existe y es ejecutable. Lo mismo aplica a los ejectuables de PATH, tenemos que comprobar que existe el comando que queremos ejecutar y que ejecutable.
 
 ### `dup` y `dup2`
 

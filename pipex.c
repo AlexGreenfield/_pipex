@@ -6,7 +6,7 @@
 /*   By: acastrov <acastrov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/17 17:59:58 by acastrov          #+#    #+#             */
-/*   Updated: 2024/12/18 16:55:31 by acastrov         ###   ########.fr       */
+/*   Updated: 2024/12/18 17:17:28 by acastrov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,7 +57,7 @@ static int	child_1(char **argv, int *fd, int *file_in, int *file_out)
 			exit(1);
 		}
 		ft_close_all(fd, file_in, file_out);
-		execlp("/bin/sh", "sh", "-c", argv[2], NULL);
+		execlp("/bin/sh", "sh", "-c", argv[2], NULL); // Estamos haciendo una llamada a shell, no ejecutandoo el programa!!!
 		perror("Error executing cmd1");
 		exit(1);
 	}
@@ -85,7 +85,7 @@ static int	child_2(char **argv, int *fd, int *file_in, int *file_out)
 			exit(1);
 		}
 		ft_close_all(fd, file_in, file_out);
-		execlp("/bin/sh", "sh", "-c", argv[3], NULL);
+		execlp("/bin/sh", "sh", "-c", argv[3], NULL); // Estamos haciendo una llamada a shell, no ejecutandoo el programa!!!
 		perror("Error executing cmd2");
 		exit(1);
 	}

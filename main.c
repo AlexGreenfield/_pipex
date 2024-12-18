@@ -6,7 +6,7 @@
 /*   By: acastrov <acastrov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/17 19:31:21 by acastrov          #+#    #+#             */
-/*   Updated: 2024/12/17 19:31:36 by acastrov         ###   ########.fr       */
+/*   Updated: 2024/12/18 17:06:15 by acastrov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@ int	main(int argc, char **argv)
 	if (argc == 5)
 	{
 		if (ft_pipex(argv) == 0)
-			printf("Exito");
+			printf("Exito en pipex");
 	}
 	return (0);
 }
