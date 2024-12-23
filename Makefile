@@ -6,7 +6,7 @@
 #    By: acastrov <acastrov@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/12/18 18:33:48 by acastrov          #+#    #+#              #
-#    Updated: 2024/12/18 18:35:04 by acastrov         ###   ########.fr        #
+#    Updated: 2024/12/23 18:28:39 by acastrov         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -17,8 +17,7 @@ LIBFT = libft.a
 LIBFTDIR = ./libft
 
 SRCS = pipex.c \
-	pipex_checks.c \
-	pipex_close.c \
+	pipex_args.c \
 
 OBJS = $(SRCS:.c=.o)
 

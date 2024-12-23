@@ -5,91 +5,45 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: acastrov <acastrov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/12/17 17:59:58 by acastrov          #+#    #+#             */
-/*   Updated: 2024/12/18 19:43:05 by acastrov         ###   ########.fr       */
+/*   Created: 2024/12/20 17:27:21 by acastrov          #+#    #+#             */
+/*   Updated: 2024/12/23 18:32:01 by acastrov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 
-int			ft_pipex(char **argv);
-static int	child_1(char **argv, int *fd, int *file_in, int *file_out);
-static int	child_2(char **argv, int *fd, int *file_in, int *file_out);
-
-int	ft_pipex(char **argv)
+int	main(int argc, char **argv)
 {
-	int	fd[2];
-	int	file_in;
-	int	file_out;
+	t_cmd *cmd;
+	//t_fd_pipe *fd_pipe;
 
-	if (ft_check_pipex(argv, fd, &file_in, &file_out) != 0)
-		return (1);
-	if (child_1(argv, fd, &file_in, &file_out) != 0)
+	if (argc == 5)
 	{
-		ft_close_all(fd, &file_in, &file_out);
-		return (1);
+		cmd = malloc(sizeof(t_cmd));
+		if(!cmd)
+			return (MALLOC_ERROR);
+		if(ft_parse_args(cmd, argc, argv) != SUCCESS)
+			return (MALLOC_ERROR);
+		printf("First argument is :%s\n", cmd->cmd_arg[0][0]);
+		printf("And sub argument is :%s\n", cmd->cmd_arg[0][1]);
+		printf("Second argument is :%s\n", cmd->cmd_arg[1][0]);
+		printf("And sub argument is :%s\n", cmd->cmd_arg[1][1]);
+		printf("Third argument is :%s\n", cmd->cmd_arg[2][0]);
+		printf("And sub argument is :%s\n", cmd->cmd_arg[2][1]);
+
+		// Parse args
+		// 1 st check cmd and files with access
+		// If ok, alloc structs
+		// Fill structs
+		// Call to child 1
+		// Call to chil 2
+		// Close everything
 	}
-	if (child_2(argv, fd, &file_in, &file_out) != 0)
+	else
 	{
-		ft_close_all(fd, &file_in, &file_out);
+		write (2, "Not enough arguments", 21);
 		return (1);
 	}
 	return (0);
 }
 
-static int	child_1(char **argv, int *fd, int *file_in, int *file_out)
-{
-	int	pid1;
-
-	pid1 = fork();
-	if (pid1 < 0)
-		return (1);
-	if (pid1 == 0)
-	{
-		if (dup2(*file_in, STDIN_FILENO) < 0)
-		{
-			perror("Error duplicating file_in");
-			exit(1);
-		}
-		if (dup2(fd[1], STDOUT_FILENO) < 0)
-		{
-			perror("Error duplicating pipe write end");
-			exit(1);
-		}
-		ft_close_all(fd, file_in, file_out);
-		execlp("/bin/sh", "sh", "-c", argv[2], NULL);
-		perror("Error executing cmd1");
-		exit(1);
-	}
-	waitpid(pid1, NULL, 0);
-	return (0);
-}
-
-static int	child_2(char **argv, int *fd, int *file_in, int *file_out)
-{
-	int	pid2;
-
-	pid2 = fork();
-	if (pid2 < 0)
-		return (1);
-	if (pid2 == 0)
-	{
-		if (dup2(fd[0], STDIN_FILENO) < 0)
-		{
-			perror("Error duplicating pipe write beggining");
-			exit(1);
-		}
-		if (dup2(*file_out, STDOUT_FILENO) < 0)
-		{
-			perror("Error duplicating file_out");
-			exit(1);
-		}
-		ft_close_all(fd, file_in, file_out);
-		execlp("/bin/sh", "sh", "-c", argv[3], NULL);
-		perror("Error executing cmd2");
-		exit(1);
-	}
-	ft_close_all(fd, file_in, file_out);
-	waitpid(pid2, NULL, 0);
-	return (0);
-}
