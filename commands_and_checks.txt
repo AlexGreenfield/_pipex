@@ -1,0 +1,33 @@
+// Term commands
+
+cc pipex.c pipex.a -o pipex
+./pipex infile "ls -l" "wc -c"  outfile
+
+// CMD printf
+
+int j = 0;
+		while (cmd->cmd_arg[j] != NULL)
+		{
+			int i = 0;
+			while (cmd->cmd_arg[j][i] != NULL)
+			{
+				printf("CMD is :%s\n", cmd->cmd_arg[j][i]);
+				i++;
+			}
+			j++;
+		}
+
+// Path printf
+
+while (*cmd->cmd_paths)
+		{
+			printf("My path is %s\n", *cmd->cmd_paths);
+			cmd->cmd_paths++;
+		}
+
+// 1 st check cmd and files with access
+		// If ok, alloc structs
+		// Fill structs
+		// Call to child 1
+		// Call to chil 2
+		// Close everything

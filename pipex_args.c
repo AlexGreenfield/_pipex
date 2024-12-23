@@ -6,7 +6,7 @@
 /*   By: acastrov <acastrov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/23 17:23:07 by acastrov          #+#    #+#             */
-/*   Updated: 2024/12/23 18:23:10 by acastrov         ###   ########.fr       */
+/*   Updated: 2024/12/23 20:33:08 by acastrov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,23 +20,41 @@ int	ft_parse_args(t_cmd *cmd, int argc, char **argv)
 	i = 0;
 	j = 0;
 	cmd->cmd_count = argc - 3;
-	cmd->cmd_arg = malloc(cmd->cmd_count * sizeof(char **));
-	if(!cmd->cmd_arg)
+	cmd->cmd_arg = NULL;
+	cmd->cmd_arg = malloc((cmd->cmd_count + 1) * sizeof(char **));
+	if (!cmd->cmd_arg)
 		return (MALLOC_ERROR);
 	while (i < cmd->cmd_count)
 	{
 		cmd->cmd_arg[i] = ft_split(argv[i + 2], ' ');
 		if (!cmd->cmd_arg[i])
-		{
-			while (j <= i)
-			{
-				free(cmd->cmd_arg[j]);
-				j++;
-			}
-			free(cmd->cmd_arg);
 			return (MALLOC_ERROR);
-		}
 		i++;
 	}
+	cmd->cmd_arg[i] = NULL;
 	return (SUCCESS);
+}
+
+int	ft_get_path(t_cmd *cmd, char **envp)
+{
+	char	*path_envp;
+
+	path_envp = ft_find_path(envp);
+	if (path_envp == NULL)
+		return (FILE_ERROR);
+	cmd->cmd_paths = ft_split(path_envp, ':');
+	if (!cmd->cmd_paths)
+		return (MALLOC_ERROR);
+	return (SUCCESS);
+}
+
+char	*ft_find_path(char **envp)
+{
+	while (*envp)
+	{
+		if (ft_strncmp(*envp, "PATH=", 5) == 0)
+			return (*envp + 5);
+		envp++;
+	}
+	return (NULL);
 }

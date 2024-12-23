@@ -6,14 +6,13 @@
 /*   By: acastrov <acastrov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/17 18:24:11 by acastrov          #+#    #+#             */
-/*   Updated: 2024/12/23 18:27:24 by acastrov         ###   ########.fr       */
+/*   Updated: 2024/12/23 19:55:22 by acastrov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 // Global def
 #ifndef PIPEX_H
 # define PIPEX_H
-#endif
 
 // Libs
 # include <fcntl.h>
@@ -26,11 +25,9 @@
 # include "libft/libft.h"
 
 // Macros for error
-# ifndef SUCCESS
 #  define SUCCESS 0
-# ifndef MALLOC_ERROR
 #  define MALLOC_ERROR 1
-# endif
+#  define FILE_ERROR 2
 
 // Structs
 typedef struct s_fd_pipe
@@ -53,6 +50,13 @@ int		ft_pipex(char **argv, t_cmd cmd, t_fd_pipe fd_pipe);
 
 // Args
 int ft_parse_args(t_cmd *cmd, int argc, char **argv);
+int ft_get_path(t_cmd *cmd, char **envp);
+char *ft_find_path(char **envp);
+
+// Free
+int	ft_free_cmd(t_cmd *cmd, int flag);
+void	ft_free_cmd_paths(char **cmd_paths);
+void	ft_free_cmd_arg(char ***cmd_arg);
 
 // Check ft
 int		ft_check_pipex(char **argv, int *fd, int *file_in, int *file_out);
@@ -61,4 +65,5 @@ int		ft_check_fork(int pid, int *fd, int *file_in, int *file_out);
 // Close ft
 void	ft_close_all(int *fd, int *file_in, int *file_out);
 
+// Close PIPEX_H
 #endif
