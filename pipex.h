@@ -6,7 +6,7 @@
 /*   By: acastrov <acastrov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/17 18:24:11 by acastrov          #+#    #+#             */
-/*   Updated: 2025/01/02 19:40:31 by acastrov         ###   ########.fr       */
+/*   Updated: 2025/01/02 21:05:17 by acastrov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,6 +42,8 @@ typedef struct s_cmd
 	char	**cmd_paths;
 	char	***cmd_arg;
 	int		cmd_count;
+	char	*cmd_1;
+	char	*cmd_2;
 }	t_cmd;
 
 // Main pipex
@@ -58,7 +60,10 @@ void	ft_free_cmd_paths(char **cmd_paths);
 void	ft_free_cmd_arg(char ***cmd_arg);
 
 // Check ft
-int	ft_check_files_cmd(t_cmd *cmd, int argc, char **argv);
+int		ft_check_files_cmd(t_cmd *cmd, int argc, char **argv);
+int		ft_check_files(int argc, char **argv);
+int		ft_check_cmd_1(t_cmd *cmd);
+int		ft_check_cmd_2(t_cmd *cmd);
 
 // Close ft
 void	ft_close_all(int *fd, int *file_in, int *file_out);

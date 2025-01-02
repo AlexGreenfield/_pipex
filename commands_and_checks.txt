@@ -1,7 +1,7 @@
 // Term commands
 
 cc pipex.c pipex.a -o pipex
-./pipex infile "ls -l" "wc -c"  outfile
+valgrind ./pipex infile "ls -l" "wc -c"  outfile
 
 // CMD printf
 

@@ -6,7 +6,7 @@
 /*   By: acastrov <acastrov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/23 17:23:07 by acastrov          #+#    #+#             */
-/*   Updated: 2024/12/23 20:33:08 by acastrov         ###   ########.fr       */
+/*   Updated: 2025/01/02 21:08:59 by acastrov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,8 @@ int	ft_parse_args(t_cmd *cmd, int argc, char **argv)
 	j = 0;
 	cmd->cmd_count = argc - 3;
 	cmd->cmd_arg = NULL;
+	cmd->cmd_1 = NULL;
+	cmd->cmd_2 = NULL;
 	cmd->cmd_arg = malloc((cmd->cmd_count + 1) * sizeof(char **));
 	if (!cmd->cmd_arg)
 		return (MALLOC_ERROR);

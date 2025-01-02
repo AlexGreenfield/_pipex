@@ -6,7 +6,7 @@
 /*   By: acastrov <acastrov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/23 19:24:52 by acastrov          #+#    #+#             */
-/*   Updated: 2024/12/23 20:34:38 by acastrov         ###   ########.fr       */
+/*   Updated: 2025/01/02 21:09:45 by acastrov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,10 @@ int	ft_free_cmd(t_cmd *cmd, int flag)
 		ft_free_cmd_paths(cmd->cmd_paths);
 	if (cmd->cmd_arg)
 		ft_free_cmd_arg(cmd->cmd_arg);
+	if (cmd->cmd_1)
+		free(cmd->cmd_1);
+	if (cmd->cmd_2)
+		free(cmd->cmd_2);
 	free(cmd);
 	return (flag);
 }
