@@ -19,11 +19,13 @@ int j = 0;
 
 // Path printf
 
-while (*cmd->cmd_paths)
+j = 0;
+	while (cmd->cmd_paths[j] != NULL)
 		{
 			printf("My path is %s\n", *cmd->cmd_paths);
-			cmd->cmd_paths++;
+			j++;
 		}
+
 
 // 1 st check cmd and files with access
 		// If ok, alloc structs
