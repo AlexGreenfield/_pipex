@@ -1,6 +1,6 @@
 // Term commands
 
-cc pipex.c pipex.a -o pipex
+cc pipex.c pipex.a -o pipex -Wall -Werror -Wextra
 valgrind ./pipex infile "ls -l" "wc -c"  outfile
 
 // CMD printf

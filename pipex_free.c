@@ -6,7 +6,7 @@
 /*   By: acastrov <acastrov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/23 19:24:52 by acastrov          #+#    #+#             */
-/*   Updated: 2025/01/02 21:09:45 by acastrov         ###   ########.fr       */
+/*   Updated: 2025/01/03 20:24:17 by acastrov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,4 +57,14 @@ void	ft_free_cmd_arg(char ***cmd_arg)
 		i++;
 	}
 	free(cmd_arg);
+}
+
+int	ft_free_fd_pipe(t_fd_pipe *fd_pipe, int flag)
+{
+	close(fd_pipe->in_fd);
+	close(fd_pipe->out_fd);
+	close(fd_pipe->fd[0]);
+	close(fd_pipe->fd[1]);
+	free(fd_pipe);
+	return (flag);
 }

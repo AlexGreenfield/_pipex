@@ -6,7 +6,7 @@
 /*   By: acastrov <acastrov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/17 18:24:11 by acastrov          #+#    #+#             */
-/*   Updated: 2025/01/02 21:05:17 by acastrov         ###   ########.fr       */
+/*   Updated: 2025/01/03 20:23:50 by acastrov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,8 @@
 # define SUCCESS 0
 # define MALLOC_ERROR 1
 # define FILE_ERROR 2
+# define PIPE_ERROR 3
+# define FORK_ERROR 4
 
 // Structs
 typedef struct s_fd_pipe
@@ -48,6 +50,9 @@ typedef struct s_cmd
 
 // Main pipex
 int		ft_pipex(char **argv, t_cmd cmd, t_fd_pipe fd_pipe);
+int		ft_init_pipex(t_cmd *cmd, int argc, char **argv, char **enpv);
+int		ft_child_1(t_cmd *cmd, t_fd_pipe *fd_pipe, char **enpv);
+int		ft_child_2(t_cmd *cmd, t_fd_pipe *fd_pipe, char **enpv);
 
 // Args
 int		ft_parse_args(t_cmd *cmd, int argc, char **argv);
@@ -58,6 +63,7 @@ char	*ft_find_path(char **envp);
 int		ft_free_cmd(t_cmd *cmd, int flag);
 void	ft_free_cmd_paths(char **cmd_paths);
 void	ft_free_cmd_arg(char ***cmd_arg);
+int		ft_free_fd_pipe(t_fd_pipe *fd_pipe, int flag);
 
 // Check ft
 int		ft_check_files_cmd(t_cmd *cmd, int argc, char **argv);
@@ -65,8 +71,7 @@ int		ft_check_files(int argc, char **argv);
 int		ft_check_cmd_1(t_cmd *cmd);
 int		ft_check_cmd_2(t_cmd *cmd);
 
-// Close ft
-void	ft_close_all(int *fd, int *file_in, int *file_out);
+// Open
+int		ft_open_fd(t_fd_pipe *fd_pipe, int argc, char **argv);
 
-// Close PIPEX_H
 #endif
