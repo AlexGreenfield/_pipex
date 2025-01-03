@@ -6,7 +6,7 @@
 /*   By: acastrov <acastrov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/17 18:24:11 by acastrov          #+#    #+#             */
-/*   Updated: 2025/01/03 20:23:50 by acastrov         ###   ########.fr       */
+/*   Updated: 2025/01/03 21:14:47 by acastrov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,8 +66,8 @@ void	ft_free_cmd_arg(char ***cmd_arg);
 int		ft_free_fd_pipe(t_fd_pipe *fd_pipe, int flag);
 
 // Check ft
-int		ft_check_files_cmd(t_cmd *cmd, int argc, char **argv);
-int		ft_check_files(int argc, char **argv);
+int		ft_check_files_cmd(t_cmd *cmd, char **argv);
+int		ft_check_files(char **argv);
 int		ft_check_cmd_1(t_cmd *cmd);
 int		ft_check_cmd_2(t_cmd *cmd);
 

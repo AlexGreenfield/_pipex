@@ -6,37 +6,37 @@
 /*   By: acastrov <acastrov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/02 19:34:06 by acastrov          #+#    #+#             */
-/*   Updated: 2025/01/02 21:12:03 by acastrov         ###   ########.fr       */
+/*   Updated: 2025/01/03 21:14:32 by acastrov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 
-int	ft_check_files(int argc, char **argv);
+int	ft_check_files(char **argv);
 int	ft_check_cmd_1(t_cmd *cmd);
 int	ft_check_cmd_2(t_cmd *cmd);
 
-int	ft_check_files_cmd(t_cmd *cmd, int argc, char **argv)
+int	ft_check_files_cmd(t_cmd *cmd, char **argv)
 {
-	if (ft_check_files(argc, argv) != SUCCESS)
+	if (ft_check_files(argv) != SUCCESS)
 		return (FILE_ERROR);
 	if (ft_check_cmd_1(cmd) || ft_check_cmd_2(cmd) != SUCCESS)
 		return (FILE_ERROR);
 	return (SUCCESS);
 }
 
-int	ft_check_files(int argc, char **argv)
+int	ft_check_files(char **argv)
 {
 	if (access(argv[1], R_OK) != 0)
 	{
 		perror("Infile it's not accesible");
 		return (FILE_ERROR);
 	}
-	if (access(argv[argc - 1], W_OK) != 0)
+	/*if (access(argv[argc - 1], W_OK) != 0)
 	{
 		perror("Outfile it's not accesible");
 		return (FILE_ERROR);
-	}
+	}*/
 	return (SUCCESS);
 }
 

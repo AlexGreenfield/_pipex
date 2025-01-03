@@ -6,7 +6,7 @@
 /*   By: acastrov <acastrov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/20 17:27:21 by acastrov          #+#    #+#             */
-/*   Updated: 2025/01/03 20:23:36 by acastrov         ###   ########.fr       */
+/*   Updated: 2025/01/03 21:15:10 by acastrov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ int	main(int argc, char **argv, char **envp)
 			return (ft_free_cmd(cmd, MALLOC_ERROR));
 		if (ft_get_path(cmd, envp) != SUCCESS)
 			return (ft_free_cmd(cmd, FILE_ERROR));
-		if (ft_check_files_cmd(cmd, argc, argv) != SUCCESS)
+		if (ft_check_files_cmd(cmd, argv) != SUCCESS)
 			return (ft_free_cmd(cmd, FILE_ERROR));
 		if (ft_init_pipex(cmd, argc, argv, envp) != SUCCESS)
 			return (ft_free_cmd(cmd, FILE_ERROR));
@@ -53,11 +53,13 @@ int	ft_init_pipex(t_cmd *cmd, int argc, char **argv, char **enpv)
 	if (ft_open_fd(fd_pipe, argc, argv) != SUCCESS)
 		return (ft_free_fd_pipe(fd_pipe, FILE_ERROR));
 	pid1 = fork();
-	pid2 = fork ();
-	if (pid1 < 0 || pid2 < 0)
+	if (pid1 < 0)
 		return (ft_free_fd_pipe (fd_pipe, FORK_ERROR));
 	if (pid1 == 0)
 		ft_child_1(cmd, fd_pipe, enpv);
+	pid2 = fork ();
+	if (pid2 < 0)
+		return (ft_free_fd_pipe (fd_pipe, FORK_ERROR));
 	if (pid2 == 0)
 		ft_child_2(cmd, fd_pipe, enpv);
 	ft_free_fd_pipe(fd_pipe, SUCCESS);
