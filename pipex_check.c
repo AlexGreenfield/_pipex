@@ -6,7 +6,7 @@
 /*   By: acastrov <acastrov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/02 19:34:06 by acastrov          #+#    #+#             */
-/*   Updated: 2025/01/03 21:14:32 by acastrov         ###   ########.fr       */
+/*   Updated: 2025/01/03 23:08:42 by acastrov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,11 +32,6 @@ int	ft_check_files(char **argv)
 		perror("Infile it's not accesible");
 		return (FILE_ERROR);
 	}
-	/*if (access(argv[argc - 1], W_OK) != 0)
-	{
-		perror("Outfile it's not accesible");
-		return (FILE_ERROR);
-	}*/
 	return (SUCCESS);
 }
 

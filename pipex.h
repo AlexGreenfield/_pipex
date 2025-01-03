@@ -6,7 +6,7 @@
 /*   By: acastrov <acastrov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/17 18:24:11 by acastrov          #+#    #+#             */
-/*   Updated: 2025/01/03 21:14:47 by acastrov         ###   ########.fr       */
+/*   Updated: 2025/01/03 23:05:16 by acastrov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,6 @@
 # include <unistd.h>
 # include <sys/types.h>
 # include <sys/wait.h>
-# include "libft/libft.h"
 
 // Macros for error
 # define SUCCESS 0
@@ -73,5 +72,16 @@ int		ft_check_cmd_2(t_cmd *cmd);
 
 // Open
 int		ft_open_fd(t_fd_pipe *fd_pipe, int argc, char **argv);
+
+// Libft
+char	*ft_strchr(const char *s, int c);
+char	*ft_strdup(const char *s);
+size_t	ft_strlcat(char *dst, const char *src, size_t size);
+size_t	ft_strlcpy(char *dst, const char *src, size_t size);
+size_t	ft_strlen(const char *s);
+char	**ft_split(char const *s, char c);
+int		ft_strncmp(const char *s1, const char *s2, size_t n);
+char	*ft_strjoin(char const *s1, char const *s2);
+char	*ft_substr(char const *s, unsigned int start, size_t len);
 
 #endif
