@@ -6,7 +6,7 @@
 /*   By: acastrov <acastrov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/23 17:23:07 by acastrov          #+#    #+#             */
-/*   Updated: 2025/01/02 21:08:59 by acastrov         ###   ########.fr       */
+/*   Updated: 2025/01/04 21:08:44 by acastrov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,8 +21,8 @@ int	ft_parse_args(t_cmd *cmd, int argc, char **argv)
 	j = 0;
 	cmd->cmd_count = argc - 3;
 	cmd->cmd_arg = NULL;
-	cmd->cmd_1 = NULL;
-	cmd->cmd_2 = NULL;
+	cmd->cmd_1 = NULL; // Check
+	cmd->cmd_2 = NULL; // Check
 	cmd->cmd_arg = malloc((cmd->cmd_count + 1) * sizeof(char **));
 	if (!cmd->cmd_arg)
 		return (MALLOC_ERROR);
@@ -43,7 +43,7 @@ int	ft_get_path(t_cmd *cmd, char **envp)
 
 	path_envp = ft_find_path(envp);
 	if (path_envp == NULL)
-		return (FILE_ERROR);
+		return (FILE_ERROR); // Fix this shit, si es ruta absoluta no se comprueba path
 	cmd->cmd_paths = ft_split(path_envp, ':');
 	if (!cmd->cmd_paths)
 		return (MALLOC_ERROR);
