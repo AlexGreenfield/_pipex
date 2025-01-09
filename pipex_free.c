@@ -6,7 +6,7 @@
 /*   By: acastrov <acastrov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/23 19:24:52 by acastrov          #+#    #+#             */
-/*   Updated: 2025/01/09 19:12:31 by acastrov         ###   ########.fr       */
+/*   Updated: 2025/01/09 20:04:35 by acastrov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,15 +19,9 @@ int	ft_free_cmd(t_cmd *cmd, int flag)
 	if (cmd->cmd_arg)
 		ft_free_cmd_arg(cmd->cmd_arg);
 	if (cmd->cmd_1)
-	{
-		printf("free cmd_1\n");
 		free(cmd->cmd_1);
-	}
 	if (cmd->cmd_2)
-	{
-		printf("free cmd_2\n");
 		free(cmd->cmd_2);
-	}
 	free(cmd);
 	return (flag);
 }
@@ -67,10 +61,14 @@ void	ft_free_cmd_arg(char ***cmd_arg)
 
 int	ft_free_fd_pipe(t_fd_pipe *fd_pipe, int flag)
 {
-	close(fd_pipe->in_fd);
-	close(fd_pipe->out_fd);
-	close(fd_pipe->fd[0]);
-	close(fd_pipe->fd[1]);
+	if (fd_pipe->in_fd >= 0)
+		close(fd_pipe->in_fd);
+	if (fd_pipe->out_fd >= 0)
+		close(fd_pipe->out_fd);
+	if (fd_pipe->fd[0] >= 0)
+		close(fd_pipe->fd[0]);
+	if (fd_pipe->fd[1] >= 0)
+		close(fd_pipe->fd[1]);
 	free(fd_pipe);
 	return (flag);
 }

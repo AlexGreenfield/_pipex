@@ -1,6 +1,5 @@
 EX1 'normal'
 < infile.txt ls | cat > outfile.txt
-valgrind --track-fds=all ./pipex infile.txt ls cat outfile.txt
 
 EX2 con flags
 < infile.txt ls -l | cat -e > outfile.txt
@@ -10,7 +9,7 @@ EX3 con contrabarra
 < infile.txt \ls | \cat > outfile.txt
 valgrind --track-fds=all ./pipex infile.txt \ls \cat outfile.txt
 
-EX4 ruta absoluta // invalid free
+EX4 ruta absoluta
 < infile.txt /bin/ls | /bin/cat > outfile.txt
 valgrind --track-fds=all ./pipex infile.txt /bin/ls /bin/cat outfile.txt
 
@@ -18,7 +17,7 @@ EX5 uno con flags y el otro no
 < infile.txt ls | wc -l > outfile.txt
 valgrind --track-fds=all ./pipex infile.txt ls "wc -l" outfile.txt
 
-EX6, unos de los archivos no existe, es NULL, lo gestiona el hijo //invalid file descriptor
+EX6, unos de los archivos no existe, es NULL, lo gestiona el hijo // Ya no fallo, pero dos procesos
 < "" ls | wc -l > outfile.txt
 valgrind --track-fds=all ./pipex "" ls "wc -l" outfile.txt
 
@@ -26,21 +25,21 @@ EX7 no existe infile // bad file descriptor
 < file.txt ls | wc -l > outfile.txt
 valgrind --track-fds=all ./pipex file.txt ls "wc -l" outfile.txt
 
-EX9, los archivos son NULL, lo gestionan los hijos // invalid file descriptor
+EX9, los archivos son NULL, lo gestionan los hijos
 < "" ls | cat > ""
 valgrind --track-fds=all ./pipex "" ls cat ""
 
-EX10, los ejecutables son NULL, lo gestionan los hijos // 1 leak
-< infile.txt "" | "" > /dev/stdout
+EX10, los ejecutables son NULL, lo gestionan los hijos // No crea outfile
+< infile.txt "" | "" > outfile.txt
 valgrind --track-fds=all ./pipex infile.txt "" "" outfile.txt
 
-EX11, siendo /wc (en ruta relativa) un archivo en lugar de un binario ejecutable // invalid free
+EX11, siendo /wc (en ruta relativa) un archivo en lugar de un binario ejecutable // No crea outfile
 #!/bin/bash
 ls
-< infile.txt /wc | cat > outfile.txt
+< infile.txt /wc | cat > outfile.txt // No crea outfile
 valgrind --track-fds=all ./pipex infile.txt /wc cat outfile.txt
 
-EX12 // invalid free
+EX12 // No crea outfile
 < infile.txt ./wc | cat > outfile.txt
 valgrind --track-fds=all ./pipex infile.txt ./wc cat outfile.txt
 
