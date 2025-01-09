@@ -6,7 +6,7 @@
 /*   By: acastrov <acastrov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/23 17:23:07 by acastrov          #+#    #+#             */
-/*   Updated: 2025/01/08 20:11:26 by acastrov         ###   ########.fr       */
+/*   Updated: 2025/01/09 20:36:28 by acastrov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@ int	ft_get_path(t_cmd *cmd, char **envp)
 
 	path_envp = ft_find_path(envp);
 	if (path_envp == NULL)
-		return (FILE_ERROR); // Fix this shit, si es ruta absoluta no se comprueba path
+		return (FILE_ERROR);
 	cmd->cmd_paths = ft_split(path_envp, ':');
 	if (!cmd->cmd_paths)
 		return (MALLOC_ERROR);

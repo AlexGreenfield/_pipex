@@ -29,7 +29,7 @@ EX9, los archivos son NULL, lo gestionan los hijos
 < "" ls | cat > ""
 valgrind --track-fds=all ./pipex "" ls cat ""
 
-EX10, los ejecutables son NULL, lo gestionan los hijos // No crea outfile
+EX10, los ejecutables son NULL, lo gestionan los hijos // No crea outfile, si no si pero tengo que cerrar std
 < infile.txt "" | "" > outfile.txt
 valgrind --track-fds=all ./pipex infile.txt "" "" outfile.txt
 

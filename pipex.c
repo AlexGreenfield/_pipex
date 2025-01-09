@@ -6,7 +6,7 @@
 /*   By: acastrov <acastrov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/20 17:27:21 by acastrov          #+#    #+#             */
-/*   Updated: 2025/01/09 18:51:32 by acastrov         ###   ########.fr       */
+/*   Updated: 2025/01/09 20:33:25 by acastrov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,9 +29,9 @@ int	main(int argc, char **argv, char **envp)
 			return (ft_free_cmd(cmd, MALLOC_ERROR));
 		if (ft_get_path(cmd, envp) != SUCCESS)
 			return (ft_free_cmd(cmd, FILE_ERROR));
-		//ft_check_files_cmd(cmd, argv);
-		if (ft_check_files_cmd(cmd, argv) != SUCCESS)
-			return (ft_free_cmd(cmd, FILE_ERROR));
+		ft_check_files_cmd(cmd, argv);
+		//if (ft_check_files_cmd(cmd, argv) != SUCCESS)
+			//return (ft_free_cmd(cmd, FILE_ERROR));
 		if (ft_init_pipex(cmd, argc, argv, envp) != SUCCESS)
 			return (ft_free_cmd(cmd, FILE_ERROR));
 		return (ft_free_cmd(cmd, SUCCESS));
@@ -89,6 +89,8 @@ int	ft_child_1(t_cmd *cmd, t_fd_pipe *fd_pipe, char **enpv)
 	}
 	ft_free_fd_pipe(fd_pipe, SUCCESS);
 	execve(cmd->cmd_1, cmd->cmd_arg[0], enpv);
+	close(STDIN_FILENO);
+	close(STDOUT_FILENO);
 	perror("Error executing cmd1\n");
 	ft_free_cmd(cmd, FILE_ERROR);
 	exit(1);
@@ -114,6 +116,8 @@ int	ft_child_2(t_cmd *cmd, t_fd_pipe *fd_pipe, char **enpv)
 	ft_free_fd_pipe(fd_pipe, SUCCESS);
 	execve(cmd->cmd_2, cmd->cmd_arg[1], enpv);
 	perror("Error executing cmd2\n");
+	close(STDIN_FILENO);
+	close(STDOUT_FILENO);
 	ft_free_cmd(cmd, FILE_ERROR);
 	exit(1);
 	return (FORK_ERROR);
