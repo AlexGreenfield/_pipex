@@ -6,7 +6,7 @@
 /*   By: acastrov <acastrov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/02 19:34:06 by acastrov          #+#    #+#             */
-/*   Updated: 2025/01/09 18:37:02 by acastrov         ###   ########.fr       */
+/*   Updated: 2025/01/09 19:20:05 by acastrov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,8 +19,9 @@ int	ft_check_dir(char *cmd);
 
 int	ft_check_files_cmd(t_cmd *cmd, char **argv)
 {
-	cmd->cmd_1 = ft_strdup(argv[2]); // If strdup, we must free
+	cmd->cmd_1 = ft_strdup(argv[2]);
 	cmd->cmd_2 = ft_strdup(argv[3]);
+
 	if (ft_check_files(argv) != SUCCESS)
 		return (FILE_ERROR);
 	if (ft_check_dir(cmd->cmd_1) == 0)
@@ -43,7 +44,7 @@ int	ft_check_files_cmd(t_cmd *cmd, char **argv)
 int	ft_check_files(char **argv)
 {
 	if (access(argv[1], R_OK) != 0)
-		write(2, "Infile it's not accesible\n", 27);
+		write(2, "zsh: no such file or directory:\n", 33);
 	return (SUCCESS);
 }
 
@@ -72,18 +73,15 @@ int	ft_check_cmd_1(t_cmd *cmd)
 	{
 		temp = ft_strjoin(cmd->cmd_paths[i], "/");
 		cmd->cmd_1 = ft_strjoin(temp, cmd->cmd_arg[0][0]);
+		free(temp);
 		if (!cmd->cmd_1)
 			return (MALLOC_ERROR);
 		if (access(cmd->cmd_1, X_OK) == 0)
-		{
-			free(temp);
 			return (SUCCESS);
-		}
 		else
 		{
 			free(cmd->cmd_1);
 			cmd->cmd_1 = NULL;
-			free (temp);
 			i++;
 		}
 	}
@@ -101,18 +99,15 @@ int	ft_check_cmd_2(t_cmd *cmd)
 	{
 		temp = ft_strjoin(cmd->cmd_paths[i], "/");
 		cmd->cmd_2 = ft_strjoin(temp, cmd->cmd_arg[1][0]);
+		free(temp);
 		if (!cmd->cmd_2)
 			return (MALLOC_ERROR);
 		if (access(cmd->cmd_2, X_OK) == 0)
-		{
-			free(temp);
 			return (SUCCESS);
-		}
 		else
 		{
 			free(cmd->cmd_2);
 			cmd->cmd_2 = NULL;
-			free (temp);
 			i++;
 		}
 	}

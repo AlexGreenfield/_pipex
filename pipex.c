@@ -6,7 +6,7 @@
 /*   By: acastrov <acastrov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/20 17:27:21 by acastrov          #+#    #+#             */
-/*   Updated: 2025/01/09 18:02:00 by acastrov         ###   ########.fr       */
+/*   Updated: 2025/01/09 18:51:32 by acastrov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,23 +68,29 @@ int	ft_init_pipex(t_cmd *cmd, int argc, char **argv, char **enpv)
 	ft_free_fd_pipe(fd_pipe, SUCCESS);
 	waitpid(pid1, NULL, 0);
 	waitpid(pid2, NULL, 0);
-	return (SUCCESS); }
+	return (SUCCESS);
+}
 
 int	ft_child_1(t_cmd *cmd, t_fd_pipe *fd_pipe, char **enpv)
 {
 	if (dup2(fd_pipe->in_fd, STDIN_FILENO) < 0)
 	{
 		perror("Error duplicating file_in\n");
+		ft_free_fd_pipe(fd_pipe, FILE_ERROR);
+		ft_free_cmd(cmd, FILE_ERROR);
 		exit(1);
 	}
 	if (dup2(fd_pipe->fd[1], STDOUT_FILENO) < 0)
 	{
 		perror("Error duplicating pipe write end\n");
+		ft_free_fd_pipe(fd_pipe, FILE_ERROR);
+		ft_free_cmd(cmd, FILE_ERROR);
 		exit(1);
 	}
 	ft_free_fd_pipe(fd_pipe, SUCCESS);
 	execve(cmd->cmd_1, cmd->cmd_arg[0], enpv);
 	perror("Error executing cmd1\n");
+	ft_free_cmd(cmd, FILE_ERROR);
 	exit(1);
 	return (FORK_ERROR);
 }
@@ -94,16 +100,21 @@ int	ft_child_2(t_cmd *cmd, t_fd_pipe *fd_pipe, char **enpv)
 	if (dup2(fd_pipe->fd[0], STDIN_FILENO) < 0)
 	{
 		perror("Error duplicating pipe write beggining\n");
+		ft_free_fd_pipe(fd_pipe, FILE_ERROR);
+		ft_free_cmd(cmd, FILE_ERROR);
 		exit(1);
 	}
 	if (dup2(fd_pipe->out_fd, STDOUT_FILENO) < 0)
 	{
 		perror("Error duplicating file_out\n");
+		ft_free_fd_pipe(fd_pipe, FILE_ERROR);
+		ft_free_cmd(cmd, FILE_ERROR);
 		exit(1);
 	}
 	ft_free_fd_pipe(fd_pipe, SUCCESS);
 	execve(cmd->cmd_2, cmd->cmd_arg[1], enpv);
 	perror("Error executing cmd2\n");
+	ft_free_cmd(cmd, FILE_ERROR);
 	exit(1);
 	return (FORK_ERROR);
 }

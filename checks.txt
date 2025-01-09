@@ -30,7 +30,7 @@ EX9, los archivos son NULL, lo gestionan los hijos // invalid file descriptor
 < "" ls | cat > ""
 valgrind --track-fds=all ./pipex "" ls cat ""
 
-EX10, los ejecutables son NULL, lo gestionan los hijos
+EX10, los ejecutables son NULL, lo gestionan los hijos // 1 leak
 < infile.txt "" | "" > /dev/stdout
 valgrind --track-fds=all ./pipex infile.txt "" "" outfile.txt
 
@@ -40,8 +40,8 @@ ls
 < infile.txt /wc | cat > outfile.txt
 valgrind --track-fds=all ./pipex infile.txt /wc cat outfile.txt
 
-EX12
+EX12 // invalid free
 < infile.txt ./wc | cat > outfile.txt
-valgrind --track-fds=all ./pipex infile.txt ./wc cat outfile.txt // invalid free
+valgrind --track-fds=all ./pipex infile.txt ./wc cat outfile.txt
 
 Archivo de salida /dev/stdout
