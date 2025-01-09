@@ -6,7 +6,7 @@
 /*   By: acastrov <acastrov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/02 19:34:06 by acastrov          #+#    #+#             */
-/*   Updated: 2025/01/09 19:20:05 by acastrov         ###   ########.fr       */
+/*   Updated: 2025/01/09 20:37:34 by acastrov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,6 @@ int	ft_check_files_cmd(t_cmd *cmd, char **argv)
 {
 	cmd->cmd_1 = ft_strdup(argv[2]);
 	cmd->cmd_2 = ft_strdup(argv[3]);
-
 	if (ft_check_files(argv) != SUCCESS)
 		return (FILE_ERROR);
 	if (ft_check_dir(cmd->cmd_1) == 0)
@@ -48,7 +47,7 @@ int	ft_check_files(char **argv)
 	return (SUCCESS);
 }
 
-int ft_check_dir(char *cmd)
+int	ft_check_dir(char *cmd)
 {
 	if (ft_strncmp(cmd, "/", 1) == 0)
 		return (0);

@@ -6,7 +6,7 @@
 /*   By: acastrov <acastrov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/20 17:27:21 by acastrov          #+#    #+#             */
-/*   Updated: 2025/01/09 20:33:25 by acastrov         ###   ########.fr       */
+/*   Updated: 2025/01/09 20:37:13 by acastrov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,8 +30,6 @@ int	main(int argc, char **argv, char **envp)
 		if (ft_get_path(cmd, envp) != SUCCESS)
 			return (ft_free_cmd(cmd, FILE_ERROR));
 		ft_check_files_cmd(cmd, argv);
-		//if (ft_check_files_cmd(cmd, argv) != SUCCESS)
-			//return (ft_free_cmd(cmd, FILE_ERROR));
 		if (ft_init_pipex(cmd, argc, argv, envp) != SUCCESS)
 			return (ft_free_cmd(cmd, FILE_ERROR));
 		return (ft_free_cmd(cmd, SUCCESS));
