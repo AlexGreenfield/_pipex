@@ -6,7 +6,7 @@
 /*   By: acastrov <acastrov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/20 17:27:21 by acastrov          #+#    #+#             */
-/*   Updated: 2025/01/04 20:56:08 by acastrov         ###   ########.fr       */
+/*   Updated: 2025/01/09 18:02:00 by acastrov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,7 @@ int	main(int argc, char **argv, char **envp)
 			return (ft_free_cmd(cmd, MALLOC_ERROR));
 		if (ft_get_path(cmd, envp) != SUCCESS)
 			return (ft_free_cmd(cmd, FILE_ERROR));
+		//ft_check_files_cmd(cmd, argv);
 		if (ft_check_files_cmd(cmd, argv) != SUCCESS)
 			return (ft_free_cmd(cmd, FILE_ERROR));
 		if (ft_init_pipex(cmd, argc, argv, envp) != SUCCESS)
@@ -67,8 +68,7 @@ int	ft_init_pipex(t_cmd *cmd, int argc, char **argv, char **enpv)
 	ft_free_fd_pipe(fd_pipe, SUCCESS);
 	waitpid(pid1, NULL, 0);
 	waitpid(pid2, NULL, 0);
-	return (SUCCESS);
-}
+	return (SUCCESS); }
 
 int	ft_child_1(t_cmd *cmd, t_fd_pipe *fd_pipe, char **enpv)
 {
