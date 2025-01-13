@@ -6,7 +6,7 @@
 /*   By: acastrov <acastrov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/20 17:27:21 by acastrov          #+#    #+#             */
-/*   Updated: 2025/01/09 20:37:13 by acastrov         ###   ########.fr       */
+/*   Updated: 2025/01/13 19:46:14 by acastrov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,10 +36,9 @@ int	main(int argc, char **argv, char **envp)
 	}
 	else
 	{
-		write(2, "Not enough arguments or not PATH set\n", 38);
+		write(2, "Not enough arguments", 38);
 		return (1);
 	}
-	return (0);
 }
 
 int	ft_init_pipex(t_cmd *cmd, int argc, char **argv, char **enpv)
@@ -76,22 +75,22 @@ int	ft_child_1(t_cmd *cmd, t_fd_pipe *fd_pipe, char **enpv)
 		perror("Error duplicating file_in\n");
 		ft_free_fd_pipe(fd_pipe, FILE_ERROR);
 		ft_free_cmd(cmd, FILE_ERROR);
-		exit(1);
+		exit(FILE_ERROR);
 	}
 	if (dup2(fd_pipe->fd[1], STDOUT_FILENO) < 0)
 	{
 		perror("Error duplicating pipe write end\n");
 		ft_free_fd_pipe(fd_pipe, FILE_ERROR);
 		ft_free_cmd(cmd, FILE_ERROR);
-		exit(1);
+		exit(FILE_ERROR);
 	}
 	ft_free_fd_pipe(fd_pipe, SUCCESS);
-	execve(cmd->cmd_1, cmd->cmd_arg[0], enpv);
+	if (cmd->cmd_1 != NULL)
+		execve(cmd->cmd_1, cmd->cmd_arg[0], enpv);
 	close(STDIN_FILENO);
 	close(STDOUT_FILENO);
-	perror("Error executing cmd1\n");
 	ft_free_cmd(cmd, FILE_ERROR);
-	exit(1);
+	exit(FILE_ERROR);
 	return (FORK_ERROR);
 }
 
@@ -102,21 +101,21 @@ int	ft_child_2(t_cmd *cmd, t_fd_pipe *fd_pipe, char **enpv)
 		perror("Error duplicating pipe write beggining\n");
 		ft_free_fd_pipe(fd_pipe, FILE_ERROR);
 		ft_free_cmd(cmd, FILE_ERROR);
-		exit(1);
+		exit(FILE_ERROR);
 	}
 	if (dup2(fd_pipe->out_fd, STDOUT_FILENO) < 0)
 	{
 		perror("Error duplicating file_out\n");
 		ft_free_fd_pipe(fd_pipe, FILE_ERROR);
 		ft_free_cmd(cmd, FILE_ERROR);
-		exit(1);
+		exit(FILE_ERROR);
 	}
 	ft_free_fd_pipe(fd_pipe, SUCCESS);
-	execve(cmd->cmd_2, cmd->cmd_arg[1], enpv);
-	perror("Error executing cmd2\n");
+	if (cmd->cmd_2 != NULL)
+		execve(cmd->cmd_2, cmd->cmd_arg[1], enpv);
 	close(STDIN_FILENO);
 	close(STDOUT_FILENO);
 	ft_free_cmd(cmd, FILE_ERROR);
-	exit(1);
+	exit(FILE_ERROR);
 	return (FORK_ERROR);
 }
