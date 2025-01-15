@@ -6,7 +6,7 @@
 /*   By: acastrov <acastrov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/20 17:27:21 by acastrov          #+#    #+#             */
-/*   Updated: 2025/01/13 19:46:14 by acastrov         ###   ########.fr       */
+/*   Updated: 2025/01/15 20:07:35 by acastrov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ int	main(int argc, char **argv, char **envp)
 	}
 	else
 	{
-		write(2, "Not enough arguments", 38);
+		write(2, "Not enough arguments", 21);
 		return (1);
 	}
 }
