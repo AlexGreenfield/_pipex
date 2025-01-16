@@ -77,7 +77,7 @@ Un descriptor de archivo importante para pipex es **FD_CLOEXEC** (Close On Exec)
 
 ### Funciones que ya conocemos:
 
-* `open`: en esta ocasión, vamos a utilizar `open` para crear el fichero en el que vamos a escribir. Para ello podemos usar la flag `O_CREAT`, que permite crear un fichero desde 0 con los permisos necesarios, como `0777`. También podemos usar un biwise `|` con `O_WRONLY` para escribir en el archivo si ya existe o crearlo si no. En resument, usar `open("somefile.txt", O_WRONLY | O_CREAT | O_TRUNC, 0644)`.
+* `open`: en esta ocasión, vamos a utilizar `open` para crear el fichero en el que vamos a escribir. Para ello podemos usar la flag `O_CREAT`, que permite crear un fichero desde 0 con los permisos necesarios, como `0644`. También podemos usar un biwise `|` con `O_WRONLY` para escribir en el archivo si ya existe o crearlo si no. En resument, usar `open("somefile.txt", O_WRONLY | O_CREAT | O_TRUNC, 0644)`.
 * `close`
 * `read`
 * `write`: ahora tiene un giro, y es que en lugar de usar el fd 1 para escribir por pantalla, podemos escribir a otros fd. Util para redirigir output desde procesos diferentes.
@@ -452,7 +452,7 @@ int dup2(int oldfd, int newfd);
 `dup` crea una copia de cualquier fd y lo asigna al usando el número de fd más bajo disponible. Es decir, que si un `open` un fd de 4, podemos duplicarlo al 5 y hacer otras cosas con el. Por ejemplo.
 
 ```c
-int fd = open("example.txt", O_WRONLY | O_CREAT 0777); // Abrimos un archivo y le asignamos un fd
+int fd = open("example.txt", O_WRONLY | O_CREAT 0644); // Abrimos un archivo y le asignamos un fd
 
 int fd_dup = dup(fd); // Duplicamos el fd y escribimos en el
 write(fd, "Hello, ", 7);
@@ -465,7 +465,7 @@ write(fd_dup, "world!\n", 7); // Pero tambien podemos escribir en su copia
 Pero la chicha viene con `dup2`, ya que nos permite copiar un fd y asignarlo **a cualquier otro fd**, incluido `STDOUT`. Repito, incluido `STDOUT`. Por lo que si le asignamos 1 a nuestro fichero, cualquier escritura en `STDOUT` se realizará dentro del fichero que queramos, super útil para el pipex. Por ejemplo.
 
 ```c
-int fd = open("output.txt", O_WRONLY | O_CREAT 0777); // Abrimos un fd
+int fd = open("output.txt", O_WRONLY | O_CREAT 0644); // Abrimos un fd
 
 dup2(fd, STDOUT_FILENO) // Y sustituimos STDOUT por ese archivo
 
