@@ -6,7 +6,7 @@
 /*   By: acastrov <acastrov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/20 17:27:21 by acastrov          #+#    #+#             */
-/*   Updated: 2025/01/15 20:07:35 by acastrov         ###   ########.fr       */
+/*   Updated: 2025/01/16 16:52:32 by acastrov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,8 +63,8 @@ int	ft_init_pipex(t_cmd *cmd, int argc, char **argv, char **enpv)
 	if (pid2 == 0)
 		ft_child_2(cmd, fd_pipe, enpv);
 	ft_free_fd_pipe(fd_pipe, SUCCESS);
-	waitpid(pid1, NULL, 0);
-	waitpid(pid2, NULL, 0);
+	//waitpid(pid1, NULL, 0);
+	//waitpid(pid2, NULL, 0);
 	return (SUCCESS);
 }
 
